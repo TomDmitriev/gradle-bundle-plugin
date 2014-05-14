@@ -1,0 +1,28 @@
+buildscript {
+    repositories {
+        mavenCentral()
+
+        maven {
+            url 'file://home/artyom/.m2/repository/'
+        }
+    }
+    dependencies {
+        classpath 'org.dm.gradle:bundle-plugin:1.0-SNAPSHOT'
+    }
+}
+apply plugin: 'bundle'
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.eclipse:osgi:3.9.1-v20130814-1242'
+}
+
+bundle {
+    instructions << [
+        'Bundle-Activator': 'org.foo.bar.TestActivator'
+    ]
+}

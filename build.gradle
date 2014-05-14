@@ -1,0 +1,63 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+group 'org.dm.gradle'
+
+repositories {
+    mavenCentral()
+
+    maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
+sourceSets {
+    integTest {
+        groovy.srcDir file('src/integTest/groovy')
+        resources.srcDir file('src/integTest/resources')
+    }
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    compile 'biz.aQute.bnd:bndlib:2.2.0'
+
+    testCompile 'org.spockframework:spock-core:1.0-groovy-1.8-SNAPSHOT'
+
+    integTestCompile sourceSets.main.output
+    integTestCompile configurations.testCompile
+    integTestRuntime configurations.testRuntime
+}
+
+task integTest(type: Test, dependsOn: classes) {
+    testClassesDir = sourceSets.integTest.output.classesDir
+    classpath = sourceSets.integTest.runtimeClasspath
+    reports.html.destination = file("$buildDir/reports/integTests")
+    reports.junitXml.destination = file("$buildDir/integTest-results")
+    binResultsDir = file("${reports.junitXml.destination}/binary/integTest")
+}
+
+check.dependsOn integTest
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+/* To be replaced with nexus? plugin */
+install {
+    repositories.mavenInstaller {
+        pom.version = '1.0-SNAPSHOT'
+        pom.groupId = 'org.dm.gradle'
+        pom.artifactId = 'bundle-plugin'
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'file://home/artyom/.m2/repository/')
+        }
+    }
+}
