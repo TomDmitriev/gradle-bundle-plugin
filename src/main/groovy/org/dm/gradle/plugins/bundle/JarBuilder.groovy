@@ -24,6 +24,13 @@ class JarBuilder {
         this
     }
 
+    JarBuilder withName(String name) {
+        if (builder.bundleSymbolicName == null) {
+            builder.bundleSymbolicName = name
+        }
+        this
+    }
+
     JarBuilder withResources(files) {
         builder.setProperty INCLUDERESOURCE, files.join(',')
         builder.addClasspath files as Collection<File>
