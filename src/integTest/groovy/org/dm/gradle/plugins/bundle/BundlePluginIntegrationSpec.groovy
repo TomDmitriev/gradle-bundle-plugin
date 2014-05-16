@@ -159,7 +159,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'jar -d'
 
         then:
-        stdout =~ /The Builder is about to produce a jar using classpath: \[.+\]/
+        stdout =~ /The Builder is about to generate a jar using classpath: \[.+\]/
     }
 
     def "Displays errors"() {

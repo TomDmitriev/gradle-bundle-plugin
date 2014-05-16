@@ -60,7 +60,7 @@ class JarBuilder {
     }
 
     private void traceClasspath() {
-        LOG.debug "The Builder is about to produce a jar using classpath: ${builder.classpath.collect { it.source }}"
+        LOG.debug "The Builder is about to generate a jar using classpath: ${builder.classpath.collect { it.source }}"
     }
 
     private void traceErrors() {
