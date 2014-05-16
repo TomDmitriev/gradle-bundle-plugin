@@ -50,7 +50,9 @@ class BundleGenerator implements Action<Jar> {
 
     static File[] rsrc(Project project) {
         def output = project.sourceSets.main.output
-        [output.classesDir, output.resourcesDir]
+        [output.classesDir, output.resourcesDir].findAll {
+            it.exists()
+        }
     }
 
     static def trace(Jar jarTask) {

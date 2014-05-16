@@ -22,11 +22,13 @@ class BundlePluginIntegrationSpec extends Specification {
     String stdout, stderr
 
     void setupSpec() {
+        createSources()
+    }
+
+    private void createSources() {
         def javaSrc = createDirs projectDir.resolve('src/main/java/org/foo/bar')
-        def resources = createDirs projectDir.resolve('src/main/resources/org/foo/bar')
         javaSrc.resolve('TestActivator.java').toFile().write getClass().classLoader.getResource('TestActivator.java').text
         javaSrc.resolve('More.java').toFile().write 'package org.foo.bar;\n class More {}'
-        resources.resolve('dummy.txt').toFile().write 'abc'
     }
 
     void setup() {
@@ -99,11 +101,18 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     def "Includes project resources by default"() {
+        setup:
+        def resources = createDirs projectDir.resolve('src/main/resources/org/foo/bar')
+        resources.resolve('dummy.txt').toFile().write 'abc'
+
         when:
         executeGradleCommand 'jar'
 
         then:
         jarContains 'org/foo/bar/dummy.txt'
+
+        cleanup:
+        resources.toFile().deleteDir()
     }
 
     def "Includes project sources if instructed"() {
