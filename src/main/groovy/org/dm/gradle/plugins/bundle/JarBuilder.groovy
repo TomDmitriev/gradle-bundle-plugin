@@ -17,6 +17,13 @@ class JarBuilder {
         builder = new Builder()
     }
 
+    JarBuilder withVersion(String version) {
+        if (builder.bundleVersion == null) {
+            builder.bundleVersion = version
+        }
+        this
+    }
+
     JarBuilder withResources(files) {
         builder.setProperty INCLUDERESOURCE, files.join(',')
         builder.addClasspath files as Collection<File>

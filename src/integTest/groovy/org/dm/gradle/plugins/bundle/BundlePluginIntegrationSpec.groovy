@@ -19,7 +19,7 @@ class BundlePluginIntegrationSpec extends Specification {
     Path projectDir = Files.createTempDirectory("test")
     @Shared
     Path buildScript = projectDir.resolve('build.gradle')
-    String stdout, stderr
+    String stdout, stderr, jarName
 
     void setupSpec() {
         createSources()
@@ -45,6 +45,26 @@ class BundlePluginIntegrationSpec extends Specification {
 
         then:
         stdout =~ /(?m)^:jar$/
+    }
+
+    def "Uses project version as 'Bundle-Version' by default"() {
+        when:
+        buildScript.toFile().append '\nversion = "1.0.2"'
+        executeGradleCommand 'jar'
+        jarName = "build/libs/${projectDir.fileName}-1.0.2.jar"
+
+        then:
+        manifestContains 'Bundle-Version: 1.0.2'
+    }
+
+    def "Overwrites project version using 'Bundle-Version' instruction"() {
+        when:
+        buildScript.toFile().append '\nversion = "1.0.2"\nbundle { instructions << ["Bundle-Version": "5.0"] }'
+        executeGradleCommand 'jar'
+        jarName = "build/libs/${projectDir.fileName}-1.0.2.jar"
+
+        then:
+        manifestContains 'Bundle-Version: 5.0'
     }
 
     def "Uses bundle instructions"() {
@@ -125,6 +145,15 @@ class BundlePluginIntegrationSpec extends Specification {
         jarContains 'OSGI-OPT/src/org/foo/bar/More.java'
     }
 
+    def "Supports old OSGI plugin instruction format"() {
+        when:
+        buildScript.toFile().append '\nbundle { instruction "Built-By", "ab", "c"\ninstruction "Built-By", "x", "y", "z" }'
+        executeGradleCommand 'jar'
+
+        then:
+        manifestContains 'Built-By: ab,c,x,y,z'
+    }
+
     def "Displays builder classpath"() {
         when:
         executeGradleCommand 'jar -d'
@@ -156,10 +185,10 @@ class BundlePluginIntegrationSpec extends Specification {
         def process = "gradle clean $cmd -b $projectDir/build.gradle".execute()
         process.waitFor()
 
-        assert process.exitValue() == 0
-
         stdout = process.in.text
         stderr = process.err.text
+
+        assert process.exitValue() == 0: stderr
     }
 
     private def manifestContains(String line) {
@@ -167,7 +196,7 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private ZipFile getJarFile() {
-        new ZipFile(projectDir.resolve("build/libs/${projectDir.fileName}.jar").toFile())
+        new ZipFile(projectDir.resolve(jarName ?: "build/libs/${projectDir.fileName}.jar").toFile())
     }
 
     private def jarContains(String entry) {

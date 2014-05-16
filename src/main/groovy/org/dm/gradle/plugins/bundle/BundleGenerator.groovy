@@ -17,17 +17,23 @@ class BundleGenerator implements Action<Jar> {
                 withClasspath(cp(project)).
                 withSourcepath(src(project)).
                 withResources(rsrc(project)).
+                withVersion(version(project)).
                 withTrace(trace(jarTask)).
                 writeTo(output(jarTask))
     }
 
-    static def props(Jar jarTask) {
+    private static String version(Project project) {
+        def projectVersion = project.version
+        projectVersion == Project.DEFAULT_VERSION ? '0' : projectVersion
+    }
+
+    private static def props(Jar jarTask) {
         attributes(jarTask.manifest) + jarTask.project.bundle.instructions.collectEntries { key, value ->
             [key, value as String]
         }
     }
 
-    static def attributes(Manifest manifest) {
+    private static def attributes(Manifest manifest) {
         def effManifest = manifest.effectiveManifest
         (effManifest.sections.values() + effManifest.attributes).inject([:]) { allAttrs, attrs ->
             allAttrs << attrs
@@ -36,30 +42,32 @@ class BundleGenerator implements Action<Jar> {
         }
     }
 
-    static JarBuilder newJarBuilder(Jar jarTask) {
+    private static JarBuilder newJarBuilder(Jar jarTask) {
         jarTask.project.bundle.jarBuilderFactory.create()
     }
 
-    static File[] cp(Project project) {
+    private static File[] cp(Project project) {
         project.configurations.runtime.files
     }
 
-    static File[] src(Project project) {
-        project.sourceSets.main.allSource.srcDirs
+    private static File[] src(Project project) {
+        project.sourceSets.main.allSource.srcDirs.findAll {
+            it.exists()
+        }
     }
 
-    static File[] rsrc(Project project) {
+    private static File[] rsrc(Project project) {
         def output = project.sourceSets.main.output
         [output.classesDir, output.resourcesDir].findAll {
             it.exists()
         }
     }
 
-    static def trace(Jar jarTask) {
+    private static def trace(Jar jarTask) {
         jarTask.project.bundle.trace
     }
 
-    static def output(Jar jarTask) {
+    private static def output(Jar jarTask) {
         jarTask.archivePath
     }
 }
