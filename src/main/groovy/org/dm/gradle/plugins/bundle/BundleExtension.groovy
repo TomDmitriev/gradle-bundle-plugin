@@ -4,7 +4,7 @@ package org.dm.gradle.plugins.bundle
  * @author <a href="mailto:dm.artyom@gmail.com">Artyom Dmitriev</a>
  */
 class BundleExtension {
-    private def instructions = [:]
+    private final def instructions = [:]
 
     boolean trace = false
 
