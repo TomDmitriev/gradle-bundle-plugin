@@ -48,7 +48,7 @@ test {
 /* To be replaced with nexus? plugin */
 install {
     repositories.mavenInstaller {
-        pom.version = '0.1-SNAPSHOT'
+        pom.version = '0.1'
         pom.groupId = 'org.dm.gradle'
         pom.artifactId = 'bundle-plugin'
     }
