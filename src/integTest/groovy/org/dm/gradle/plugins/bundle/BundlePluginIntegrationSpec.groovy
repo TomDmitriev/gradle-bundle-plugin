@@ -12,7 +12,12 @@ import java.util.zip.ZipFile
 import static java.nio.file.Files.createDirectories as createDirs
 
 /**
- * @author <a href="mailto:dm.artyom@gmail.com">Artyom Dmitriev</a>
+ * A set of integration tests. The routine of each test is
+ * to execute gradle tasks against a test project and look
+ * at the result (e.g. contents of the produced jar).
+ * <p/>
+ * Currently the tests may only be run in a Unix OS with
+ * the plugin deployed in the local maven repo.
  */
 class BundlePluginIntegrationSpec extends Specification {
     @Shared

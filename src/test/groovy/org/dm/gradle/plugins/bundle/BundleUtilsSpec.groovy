@@ -6,9 +6,6 @@ import org.gradle.api.java.archives.internal.DefaultAttributes
 import org.gradle.api.java.archives.internal.DefaultManifest
 import spock.lang.Specification
 
-/**
- * @author <a href='mailto:dm.artyom@gmail.com'>Artyom Dmitriev</a>
- */
 class BundleUtilsSpec extends Specification {
     def "calculates manifest attributes"() {
         given:

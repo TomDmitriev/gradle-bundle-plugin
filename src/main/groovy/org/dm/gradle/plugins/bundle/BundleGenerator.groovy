@@ -3,20 +3,19 @@ package org.dm.gradle.plugins.bundle
 import org.gradle.api.Action
 import org.gradle.api.tasks.bundling.Jar
 
-import static org.dm.gradle.plugins.bundle.BundleUtils.newJarBuilder
-import static org.dm.gradle.plugins.bundle.BundleUtils.getBundleSymbolicName
-import static org.dm.gradle.plugins.bundle.BundleUtils.getVersion
-import static org.dm.gradle.plugins.bundle.BundleUtils.getProperties
-import static org.dm.gradle.plugins.bundle.BundleUtils.getClasspath
-import static org.dm.gradle.plugins.bundle.BundleUtils.getSources
-import static org.dm.gradle.plugins.bundle.BundleUtils.getResources
-import static org.dm.gradle.plugins.bundle.BundleUtils.getTrace
-import static org.dm.gradle.plugins.bundle.BundleUtils.getOutput
+import static org.dm.gradle.plugins.bundle.BundleUtils.*
 
 /**
- * @author <a href="mailto:dm.artyom@gmail.com">Artyom Dmitriev</a>
+ * An action to be used for generating bundles.
  */
 class BundleGenerator implements Action<Jar> {
+    /**
+     * Creates and initializes a new {@link JarBuilder} using
+     * {@link BundleExtension} parameters and uses it to produce
+     * a new bundle.
+     * @param jarTask the task within which this action is
+     * performed
+     */
     @Override
     void execute(Jar jarTask) {
         def project = jarTask.project

@@ -2,9 +2,7 @@ buildscript {
     repositories {
         mavenCentral()
 
-        maven {
-            url 'file://home/artyom/.m2/repository/'
-        }
+        mavenLocal()
     }
     dependencies {
         classpath 'org.dm.gradle:bundle-plugin:1.0-SNAPSHOT'

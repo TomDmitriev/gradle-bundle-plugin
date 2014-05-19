@@ -8,6 +8,10 @@ import org.gradle.api.logging.Logging
 import static aQute.bnd.osgi.Constants.INCLUDERESOURCE
 import static java.nio.file.Files.createDirectories as createDirs
 
+/**
+ * A jar generator, which is basically a wrapper
+ * around bnd {@link Builder}.
+ */
 class JarBuilder {
     private final static Logger LOG = Logging.getLogger(JarBuilder.class)
 

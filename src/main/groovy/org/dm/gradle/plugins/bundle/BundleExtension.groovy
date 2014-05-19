@@ -1,7 +1,7 @@
 package org.dm.gradle.plugins.bundle
 
 /**
- * @author <a href="mailto:dm.artyom@gmail.com">Artyom Dmitriev</a>
+ * A Bundle plugin extension.
  */
 class BundleExtension {
     private final def instructions = [:]

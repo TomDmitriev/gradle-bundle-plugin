@@ -6,9 +6,14 @@ import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPlugin
 
 /**
- * @author <a href="mailto:dm.artyom@gmail.com">Artyom Dmitriev</a>
+ * A bundle plugin which internally uses
+ * <a href="http://www.aqute.biz/Bnd/Bnd">the bnd tool</a>
+ * for generating bundles.
  */
 class BundlePlugin implements Plugin<Project> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void apply(Project project) {
         project.extensions.create("bundle", BundleExtension)

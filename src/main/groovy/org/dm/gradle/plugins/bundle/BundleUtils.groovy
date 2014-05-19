@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 import static java.util.regex.Pattern.compile
 
 /**
- * @author <a href="mailto:dm.artyom@gmail.com">Artyom Dmitriev</a>
+ * A set of bundle utils.
  */
 final class BundleUtils {
     /**
@@ -73,8 +73,12 @@ final class BundleUtils {
         projectVersion == Project.DEFAULT_VERSION ? '0' : version(projectVersion as String)
     }
 
-    // Visible for testing
-    // Copied from the old osgi plugin helper.
+    //Visible for testing
+    /**
+     * Gets an OSGI compliant version from the given version.
+     * <p/>
+     * The method is copied from the old osgi plugin helper.
+     */
     static String version(String version) {
         /* If it's already OSGi compliant don't touch it */
         final Matcher m = OSGI_VERSION_PATTERN.matcher(version)
@@ -127,7 +131,6 @@ final class BundleUtils {
         buf
     }
 
-    // Copied from the old osgi plugin helper.
     /**
      * Get the symbolic name as group + "." + archivesBaseName, with the following exceptions
      * <ul>
@@ -148,6 +151,7 @@ final class BundleUtils {
      * e.g. org.gradle:org.gradle.core -> org.gradle.core
      * </li>
      * </ul>
+     * The method is copied from the old osgi plugin helper.
      *
      * @param project The project being processed.
      *
@@ -155,8 +159,8 @@ final class BundleUtils {
      */
     static String getBundleSymbolicName(Project project) {
         String group = project.getGroup().toString()
-        String archiveBaseName = project.getConvention().
-                getPlugin(BasePluginConvention.class).getArchivesBaseName()
+        String archiveBaseName = project.convention.
+                getPlugin(BasePluginConvention.class).archivesBaseName
         if (archiveBaseName.startsWith(group)) {
             return archiveBaseName
         }
