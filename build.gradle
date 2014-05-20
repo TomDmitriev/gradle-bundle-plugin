@@ -1,7 +1,18 @@
-apply plugin: 'groovy'
-apply plugin: 'maven'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
 
-group 'org.dm.gradle'
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.3'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'nexus'
+
+group = 'org.dm.gradle'
+version = '0.1'
 
 repositories {
     mavenCentral()
@@ -39,25 +50,34 @@ task integTest(type: Test, dependsOn: classes) {
 
 check.dependsOn integTest
 
-test {
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
 
-/* To be replaced with nexus? plugin */
-install {
-    repositories.mavenInstaller {
-        pom.version = '0.1'
-        pom.groupId = 'org.dm.gradle'
-        pom.artifactId = 'bundle-plugin'
-    }
-}
+modifyPom {
+    project {
+        name 'Gradle Bundle Plugin'
+        packaging 'jar'
+        description 'Gradle plugin to generate OSGI bundles.'
+        url 'https://github.com/TomDmitriev/gradle-bundle-plugin'
+        inceptionYear '2014'
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            mavenLocal()
+        scm {
+            url 'scm:https://github.com/TomDmitriev/gradle-bundle-plugin.git'
+            connection 'scm:https://github.com/TomDmitriev/gradle-bundle-plugin.git'
+            developerConnection 'scm:https://github.com/TomDmitriev/gradle-bundle-plugin.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'TomDmitriev'
+                name 'Artyom Dmitriev'
+            }
         }
     }
 }

@@ -7,8 +7,27 @@ manifest but a whole jar.
 
 
 ## Installation
+Plugin is hosted in Maven Central Repository. You can easily add plugin to your build
+script using following configuration
 
-tbd
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.dm.gradle:bundle:0.1'
+    }
+}
+
+apply plugin: 'bundle'
+
+```
+
+Depending on the type of your project you also need to add `apply plugin: 'java'` or 
+`apply plugin: 'groovy'`, etc.
+
 
 ## Tasks
 
@@ -50,6 +69,9 @@ bundle {
     instruction '-wab', ''
 }
 ```
+
+Note that restrictions of the bnd tool hold true, that is for example instruction `'-sources': true`
+will not include groovy or scala sources.
 
 ### Bnd tracing
 
