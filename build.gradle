@@ -1,10 +1,12 @@
 buildscript {
     repositories {
         mavenCentral()
+
+        jcenter()
     }
 
     dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.3'
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
     }
 }
 
@@ -12,7 +14,7 @@ apply plugin: 'groovy'
 apply plugin: 'nexus'
 
 group = 'org.dm.gradle'
-version = '0.1'
+version = '0.2'
 
 repositories {
     mavenCentral()
@@ -34,6 +36,7 @@ dependencies {
     compile 'biz.aQute.bnd:bndlib:2.2.0'
 
     testCompile 'org.spockframework:spock-core:1.0-groovy-1.8-SNAPSHOT'
+    testRuntime 'cglib:cglib-nodep:3.1'
 
     integTestCompile sourceSets.main.output
     integTestCompile configurations.testCompile

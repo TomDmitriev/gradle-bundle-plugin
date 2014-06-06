@@ -46,7 +46,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Jar task is executed while build"() {
         when:
-        executeGradleCommand 'build'
+        executeGradleCommand 'clean build'
 
         then:
         stdout =~ /(?m)^:jar$/
@@ -55,7 +55,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Uses project version as 'Bundle-Version' by default"() {
         when:
         buildScript.toFile().append '\nversion = "1.0.2"'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
         jarName = "build/libs/${projectDir.fileName}-1.0.2.jar"
 
         then:
@@ -65,7 +65,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Overwrites project version using 'Bundle-Version' instruction"() {
         when:
         buildScript.toFile().append '\nversion = "1.0.2"\nbundle { instructions << ["Bundle-Version": "5.0"] }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
         jarName = "build/libs/${projectDir.fileName}-1.0.2.jar"
 
         then:
@@ -74,7 +74,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Uses bundle instructions"() {
         when:
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         manifestContains 'Bundle-Activator: org.foo.bar.TestActivator'
@@ -83,7 +83,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Uses jar manifest values"() {
         when:
         buildScript.toFile().append '\njar { manifest { attributes("Built-By": "abc") } }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         manifestContains 'Built-By: abc'
@@ -92,7 +92,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Overwrites jar manifest values"() {
         when:
         buildScript.toFile().append '\njar { manifest { attributes("Built-By": "abc") } }\nbundle { instructions << ["Built-By": "xyz"] }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         manifestContains 'Built-By: xyz'
@@ -101,7 +101,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Uses baseName and extension defined in jar task"() {
         when:
         buildScript.toFile().append '\njar { baseName = "xyz"\nextension = "baz" }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         Files.exists projectDir.resolve('build/libs/xyz.baz')
@@ -110,7 +110,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Ignores unknown attributes"() {
         when:
         buildScript.toFile().append '\nbundle { instructions << ["junk": "xyz"] }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         stdout =~ /(?m)^BUILD SUCCESSFUL$/
@@ -118,7 +118,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Includes project output class files by default"() {
         when:
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         jarContains 'org/foo/bar/TestActivator.class'
@@ -131,7 +131,7 @@ class BundlePluginIntegrationSpec extends Specification {
         resources.resolve('dummy.txt').toFile().write 'abc'
 
         when:
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         jarContains 'org/foo/bar/dummy.txt'
@@ -143,7 +143,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Includes project sources if instructed"() {
         when:
         buildScript.toFile().append '\nbundle { instructions << ["-sources": true] }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         jarContains 'OSGI-OPT/src/org/foo/bar/TestActivator.java'
@@ -153,7 +153,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Supports old OSGI plugin instruction format"() {
         when:
         buildScript.toFile().append '\nbundle { instruction "Built-By", "ab", "c"\ninstruction "Built-By", "x", "y", "z" }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         manifestContains 'Built-By: ab,c,x,y,z'
@@ -161,7 +161,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Displays builder classpath"() {
         when:
-        executeGradleCommand 'jar -d'
+        executeGradleCommand 'clean jar -d'
 
         then:
         stdout =~ /The Builder is about to generate a jar using classpath: \[.+\]/
@@ -170,7 +170,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Displays errors"() {
         when:
         buildScript.toFile().append '\nbundle { instructions << ["Bundle-Activator": "org.foo.bar.NotExistingActivator"] }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         stdout =~ /(?m)^BUILD SUCCESSFUL$/
@@ -180,14 +180,41 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Can trace bnd build process"() {
         when:
         buildScript.toFile().append '\nbundle { trace = true }'
-        executeGradleCommand 'jar'
+        executeGradleCommand 'clean jar'
 
         then:
         stderr =~ /(?m)^# build$/
     }
 
+    def "Saves manifest under build/tmp"() {
+        when:
+        executeGradleCommand 'clean jar'
+
+        then:
+        projectDir.resolve('build/tmp/jar/MANIFEST.MF').toFile().text == manifest.replaceAll('(?m)^Bnd-LastModified: \\d+$\r\n', '')
+    }
+
+    def "Does not re-execute 'jar' when manifest has not been changed"() {
+        when:
+        executeGradleCommand 'clean jar'
+        executeGradleCommand 'jar'
+
+        then:
+        stdout =~ /(?m)^:jar UP-TO-DATE$/
+    }
+
+    def "Re-executes 'jar' when manifest has been changed"() {
+        when:
+        executeGradleCommand 'clean jar'
+        buildScript.toFile().append '\nbundle { instructions << ["Built-By": "xyz"] }'
+        executeGradleCommand 'jar'
+
+        then:
+        stdout =~ /(?m)^:jar$/
+    }
+
     private def executeGradleCommand(cmd) {
-        def process = "gradle clean $cmd -b $projectDir/build.gradle".execute()
+        def process = "gradle $cmd -b $projectDir/build.gradle".execute()
         process.waitFor()
 
         stdout = process.in.text
@@ -197,7 +224,11 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private def manifestContains(String line) {
-        jarFile.getInputStream(new ZipEntry('META-INF/MANIFEST.MF')).text =~ "(?m)^$line\$"
+        manifest =~ "(?m)^$line\$"
+    }
+
+    private def getManifest() {
+        jarFile.getInputStream(new ZipEntry('META-INF/MANIFEST.MF')).text
     }
 
     private ZipFile getJarFile() {

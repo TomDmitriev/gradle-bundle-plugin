@@ -20,8 +20,12 @@ class BundlePlugin implements Plugin<Project> {
 
         project.plugins.apply(JavaBasePlugin)
         project.plugins.withType(JavaPlugin) {
-            project.jar {
-                actions = [new BundleGenerator()]
+            project.jar { jarTask ->
+                def jarBuilderFactory = new JarBuilderFactoryDecorator(
+                        jarTask, project.bundle.jarBuilderFactory)
+
+                actions = [new BundleGenerator(jarBuilderFactory)]
+                manifest = new ManifestSubstitute(jarBuilderFactory, manifest)
             }
         }
     }

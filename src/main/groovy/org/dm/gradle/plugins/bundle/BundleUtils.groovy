@@ -23,10 +23,6 @@ final class BundleUtils {
     private static final Pattern ONLY_NUMBERS = compile("[0-9]+")
     private static final Pattern QUALIFIER = compile("[0-9A-Za-z_\\-]*")
 
-    static JarBuilder newJarBuilder(Jar jarTask) {
-        jarTask.project.bundle.jarBuilderFactory.create()
-    }
-
     static def getProperties(Jar jarTask) {
         attributes(jarTask.manifest) + jarTask.project.bundle.instructions.collectEntries { key, value ->
             [key, value as String]
@@ -60,7 +56,7 @@ final class BundleUtils {
         }
     }
 
-    static def getTrace(Jar jarTask) {
+    static boolean getTrace(Jar jarTask) {
         jarTask.project.bundle.trace
     }
 

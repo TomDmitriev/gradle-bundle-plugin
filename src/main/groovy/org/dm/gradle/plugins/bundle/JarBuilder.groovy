@@ -2,11 +2,15 @@ package org.dm.gradle.plugins.bundle
 
 import aQute.bnd.osgi.Builder
 import aQute.bnd.osgi.Jar
+import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
+import java.util.jar.Manifest
+
 import static aQute.bnd.osgi.Constants.INCLUDERESOURCE
 import static java.nio.file.Files.createDirectories as createDirs
+import static java.util.Objects.requireNonNull
 
 /**
  * A jar generator, which is basically a wrapper
@@ -16,9 +20,14 @@ class JarBuilder {
     private final static Logger LOG = Logging.getLogger(JarBuilder.class)
 
     protected final Builder builder
+    protected Jar jar
 
     JarBuilder() {
-        builder = new Builder()
+        this(new Builder())
+    }
+
+    JarBuilder(Builder builder) {
+        this.builder = requireNonNull(builder)
     }
 
     JarBuilder withVersion(String version) {
@@ -61,10 +70,31 @@ class JarBuilder {
         this
     }
 
-    void writeTo(File output) {
+    void writeManifestTo(OutputStream outputStream, @Nullable Closure c) {
+        build()
+
+        def manifest = jar.manifest.clone() as Manifest
+        if (c != null) {
+            c manifest
+        }
+        Jar.writeManifest manifest, outputStream
+    }
+
+    void writeManifestTo(OutputStream outputStream) {
+        writeManifestTo outputStream, null
+    }
+
+    private void build() {
+        if (jar != null) {
+            return
+        }
         traceClasspath()
-        Jar jar = builder.build()
+        jar = builder.build()
         traceErrors()
+    }
+
+    void writeJarTo(File output) {
+        build()
 
         createDirs output.toPath().parent
         jar.write output
