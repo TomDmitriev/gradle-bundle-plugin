@@ -82,6 +82,3 @@ bundle {
     trace = true
 }
 ```
-
-## Known issues
-* Adding/removing/editing a bundle instrucion does not make Gradle to create a new bundle if you execute `gradle build`. The fix is planned for the next release. At the moment a work-around is to execute `gradle build --rerun-tasks`.
