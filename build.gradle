@@ -10,6 +10,7 @@ buildscript {
     }
 }
 
+apply plugin: 'eclipse'
 apply plugin: 'groovy'
 apply plugin: 'nexus'
 
@@ -87,5 +88,11 @@ modifyPom {
                 name 'Artyom Dmitriev'
             }
         }
+    }
+}
+
+eclipse.classpath.file {
+    whenMerged {  cp ->
+        cp.entries.removeAll { (it.kind == "src") && (it.path =~ /resources/) }
     }
 }
