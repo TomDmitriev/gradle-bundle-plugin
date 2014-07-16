@@ -14,7 +14,10 @@ apply plugin: 'groovy'
 apply plugin: 'nexus'
 
 group = 'org.dm.gradle'
-version = '0.2'
+version = '0.3'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
@@ -28,6 +31,8 @@ sourceSets {
         resources.srcDir file('src/integTest/resources')
     }
 }
+
+[compileJava, compileTestJava, compileIntegTestJava]*.options*.encoding = 'UTF-8'
 
 dependencies {
     compile gradleApi()
