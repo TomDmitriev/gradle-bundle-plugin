@@ -19,9 +19,12 @@ final class BundleUtils {
      * Bundle-Version must match this pattern
      */
     private static final Pattern OSGI_VERSION_PATTERN = compile("[0-9]+(\\.[0-9]+(\\.[0-9]+(\\.[0-9A-Za-z_-]+)?)?)?")
-
     private static final Pattern ONLY_NUMBERS = compile("[0-9]+")
     private static final Pattern QUALIFIER = compile("[0-9A-Za-z_\\-]*")
+
+    private BundleUtils() {
+        throw new AssertionError()
+    }
 
     static def getProperties(Jar jarTask) {
         attributes(jarTask.manifest) + jarTask.project.bundle.instructions.collectEntries { key, value ->
