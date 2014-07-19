@@ -9,6 +9,7 @@ import org.gradle.api.logging.Logging
 import java.util.jar.Manifest
 
 import static aQute.bnd.osgi.Constants.INCLUDERESOURCE
+import static aQute.bnd.osgi.Constants.INCLUDE_RESOURCE
 import static java.nio.file.Files.createDirectories as createDirs
 import static java.util.Objects.requireNonNull
 
@@ -45,9 +46,21 @@ class JarBuilder {
     }
 
     JarBuilder withResources(files) {
-        builder.setProperty INCLUDERESOURCE, files.join(',')
+        addToResources files
         builder.addClasspath files as Collection<File>
         this
+    }
+
+    private addToResources(files) {
+        if (files == []) {
+            return
+        }
+        def resources = files.join(',')
+        def existingResources = builder.getProperty(INCLUDERESOURCE) ?: builder.getProperty(INCLUDE_RESOURCE)
+        if (existingResources != null) {
+            resources = existingResources + ',' + resources
+        }
+        builder.setProperty INCLUDERESOURCE, resources
     }
 
     JarBuilder withClasspath(files) {

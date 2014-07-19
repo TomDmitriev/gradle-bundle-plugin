@@ -231,6 +231,36 @@ class BundlePluginIntegrationSpec extends Specification {
         manifestContains 'Private-Package: org.foo.bar,org.springframework.instrument'
     }
 
+    @Issue(9)
+    def "Supports Include-Resource header"() {
+        def resource = 'test-resource.txt'
+
+        setup:
+        projectDir.resolve(resource).toFile().write 'this resource should be included'
+
+        when:
+        buildScript.toFile().append "\nbundle { instruction 'Include-Resource', '${projectDir}/${resource}' }"
+        executeGradleCommand 'clean jar'
+
+        then:
+        jarContains resource
+    }
+
+    @Issue(9)
+    def "Supports -includeresource directive"() {
+        def resource = 'test-resource.txt'
+
+        setup:
+        projectDir.resolve(resource).toFile().write 'this resource should be included'
+
+        when:
+        buildScript.toFile().append "\nbundle { instruction '-includeresource', '${projectDir}/${resource}' }"
+        executeGradleCommand 'clean jar'
+
+        then:
+        jarContains resource
+    }
+
     private def executeGradleCommand(cmd) {
         def process = "gradle $cmd -b $projectDir/build.gradle".execute()
         process.waitFor()
