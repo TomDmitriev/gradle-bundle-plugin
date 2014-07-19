@@ -186,6 +186,7 @@ class BundlePluginIntegrationSpec extends Specification {
         stderr =~ /(?m)^# build$/
     }
 
+    @Issue(1)
     def "Saves manifest under build/tmp"() {
         when:
         executeGradleCommand 'clean jar'
@@ -194,6 +195,7 @@ class BundlePluginIntegrationSpec extends Specification {
         projectDir.resolve('build/tmp/jar/MANIFEST.MF').toFile().text == manifest.replaceAll('(?m)^Bnd-LastModified: \\d+$\r\n', '')
     }
 
+    @Issue(1)
     def "Does not re-execute 'jar' when manifest has not been changed"() {
         when:
         executeGradleCommand 'clean jar'
@@ -203,6 +205,7 @@ class BundlePluginIntegrationSpec extends Specification {
         stdout =~ /(?m)^:jar UP-TO-DATE$/
     }
 
+    @Issue(1)
     def "Re-executes 'jar' when manifest has been changed"() {
         when:
         executeGradleCommand 'clean jar'
@@ -211,6 +214,21 @@ class BundlePluginIntegrationSpec extends Specification {
 
         then:
         stdout =~ /(?m)^:jar$/
+    }
+
+    @Issue(8)
+    def "Uses instructions (Private-Package) from an included file"() {
+        setup:
+        projectDir.resolve('bnd.bnd').toFile().write 'Private-Package: org.springframework.*'
+
+        when:
+        buildScript.toFile().append """
+            dependencies { compile "org.springframework:spring-instrument:4.0.6.RELEASE" }
+            bundle { instruction "-include", "${projectDir}/bnd.bnd" }"""
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifestContains 'Private-Package: org.foo.bar,org.springframework.instrument'
     }
 
     private def executeGradleCommand(cmd) {
