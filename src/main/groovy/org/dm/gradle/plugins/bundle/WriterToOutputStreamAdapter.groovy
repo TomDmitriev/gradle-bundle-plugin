@@ -2,7 +2,7 @@ package org.dm.gradle.plugins.bundle
 
 import java.nio.charset.Charset
 
-import static java.util.Objects.requireNonNull
+import static org.dm.gradle.plugins.bundle.Objects.requireNonNull
 
 final class WriterToOutputStreamAdapter extends OutputStream {
     private final Writer writer

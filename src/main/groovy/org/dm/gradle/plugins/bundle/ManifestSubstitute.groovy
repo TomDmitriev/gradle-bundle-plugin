@@ -8,7 +8,7 @@ import org.gradle.api.java.archives.internal.DefaultManifest
 import java.nio.charset.Charset
 
 import static aQute.bnd.osgi.Constants.BND_LASTMODIFIED
-import static java.util.Objects.requireNonNull
+import static org.dm.gradle.plugins.bundle.Objects.requireNonNull
 
 class ManifestSubstitute implements Manifest {
     // With accordance to manifest specification
