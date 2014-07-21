@@ -4,12 +4,9 @@ import spock.lang.Shared
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-import java.nio.file.Files
-import java.nio.file.Path
+import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-
-import static java.nio.file.Files.createDirectories as createDirs
 
 /**
  * A set of integration tests. The routine of each test is
@@ -21,9 +18,9 @@ import static java.nio.file.Files.createDirectories as createDirs
  */
 class BundlePluginIntegrationSpec extends Specification {
     @Shared
-    Path projectDir = Files.createTempDirectory("test")
+    File projectDir = createTempDir()
     @Shared
-    Path buildScript = projectDir.resolve('build.gradle')
+    File buildScript = resolve(projectDir, 'build.gradle')
     String stdout, stderr, jarName
 
     void setupSpec() {
@@ -31,17 +28,18 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private void createSources() {
-        def javaSrc = createDirs projectDir.resolve('src/main/java/org/foo/bar')
-        javaSrc.resolve('TestActivator.java').toFile().write getClass().classLoader.getResource('TestActivator.java').text
-        javaSrc.resolve('More.java').toFile().write 'package org.foo.bar;\n class More {}'
+        def javaSrc = resolve(projectDir, 'src/main/java/org/foo/bar')
+        javaSrc.mkdirs()
+        resolve(javaSrc, 'TestActivator.java').write getClass().classLoader.getResource('TestActivator.java').text
+        resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
     }
 
     void setup() {
-        buildScript.toFile().write getClass().classLoader.getResource('build.test').text
+        buildScript.write getClass().classLoader.getResource('build.test').text
     }
 
     void cleanupSpec() {
-        projectDir.toFile().deleteDir()
+        projectDir.deleteDir()
     }
 
     def "Jar task is executed while build"() {
@@ -54,9 +52,9 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Uses project version as 'Bundle-Version' by default"() {
         when:
-        buildScript.toFile().append '\nversion = "1.0.2"'
+        buildScript.append '\nversion = "1.0.2"'
         executeGradleCommand 'clean jar'
-        jarName = "build/libs/${projectDir.fileName}-1.0.2.jar"
+        jarName = "build/libs/${projectDir.name}-1.0.2.jar"
 
         then:
         manifestContains 'Bundle-Version: 1.0.2'
@@ -64,9 +62,9 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Overwrites project version using 'Bundle-Version' instruction"() {
         when:
-        buildScript.toFile().append '\nversion = "1.0.2"\nbundle { instructions << ["Bundle-Version": "5.0"] }'
+        buildScript.append '\nversion = "1.0.2"\nbundle { instructions << ["Bundle-Version": "5.0"] }'
         executeGradleCommand 'clean jar'
-        jarName = "build/libs/${projectDir.fileName}-1.0.2.jar"
+        jarName = "build/libs/${projectDir.name}-1.0.2.jar"
 
         then:
         manifestContains 'Bundle-Version: 5.0'
@@ -82,7 +80,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Uses jar manifest values"() {
         when:
-        buildScript.toFile().append '\njar { manifest { attributes("Built-By": "abc") } }'
+        buildScript.append '\njar { manifest { attributes("Built-By": "abc") } }'
         executeGradleCommand 'clean jar'
 
         then:
@@ -91,7 +89,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Overwrites jar manifest values"() {
         when:
-        buildScript.toFile().append '\njar { manifest { attributes("Built-By": "abc") } }\nbundle { instructions << ["Built-By": "xyz"] }'
+        buildScript.append '\njar { manifest { attributes("Built-By": "abc") } }\nbundle { instructions << ["Built-By": "xyz"] }'
         executeGradleCommand 'clean jar'
 
         then:
@@ -100,16 +98,16 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Uses baseName and extension defined in jar task"() {
         when:
-        buildScript.toFile().append '\njar { baseName = "xyz"\nextension = "baz" }'
+        buildScript.append '\njar { baseName = "xyz"\nextension = "baz" }'
         executeGradleCommand 'clean jar'
 
         then:
-        Files.exists projectDir.resolve('build/libs/xyz.baz')
+        resolve(projectDir, 'build/libs/xyz.baz').exists()
     }
 
     def "Ignores unknown attributes"() {
         when:
-        buildScript.toFile().append '\nbundle { instructions << ["junk": "xyz"] }'
+        buildScript.append '\nbundle { instructions << ["junk": "xyz"] }'
         executeGradleCommand 'clean jar'
 
         then:
@@ -127,8 +125,9 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Includes project resources by default"() {
         setup:
-        def resources = createDirs projectDir.resolve('src/main/resources/org/foo/bar')
-        resources.resolve('dummy.txt').toFile().write 'abc'
+        def resources = resolve(projectDir, 'src/main/resources/org/foo/bar')
+        resources.mkdirs()
+        resolve(resources, 'dummy.txt').write 'abc'
 
         when:
         executeGradleCommand 'clean jar'
@@ -137,12 +136,12 @@ class BundlePluginIntegrationSpec extends Specification {
         jarContains 'org/foo/bar/dummy.txt'
 
         cleanup:
-        resources.toFile().deleteDir()
+        resources.deleteDir()
     }
 
     def "Includes project sources if instructed"() {
         when:
-        buildScript.toFile().append '\nbundle { instructions << ["-sources": true] }'
+        buildScript.append '\nbundle { instructions << ["-sources": true] }'
         executeGradleCommand 'clean jar'
 
         then:
@@ -152,7 +151,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Supports old OSGI plugin instruction format"() {
         when:
-        buildScript.toFile().append '\nbundle { instruction "Built-By", "ab", "c"\ninstruction "Built-By", "x", "y", "z" }'
+        buildScript.append '\nbundle { instruction "Built-By", "ab", "c"\ninstruction "Built-By", "x", "y", "z" }'
         executeGradleCommand 'clean jar'
 
         then:
@@ -169,7 +168,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Displays errors"() {
         when:
-        buildScript.toFile().append '\nbundle { instructions << ["Bundle-Activator": "org.foo.bar.NotExistingActivator"] }'
+        buildScript.append '\nbundle { instructions << ["Bundle-Activator": "org.foo.bar.NotExistingActivator"] }'
         executeGradleCommand 'clean jar'
 
         then:
@@ -179,7 +178,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     def "Can trace bnd build process"() {
         when:
-        buildScript.toFile().append '\nbundle { trace = true }'
+        buildScript.append '\nbundle { trace = true }'
         executeGradleCommand 'clean jar'
 
         then:
@@ -192,7 +191,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'clean jar'
 
         then:
-        projectDir.resolve('build/tmp/jar/MANIFEST.MF').toFile().text == manifest.replaceAll('(?m)^Bnd-LastModified: \\d+$\r\n', '')
+        resolve(projectDir, 'build/tmp/jar/MANIFEST.MF').text == manifest.replaceAll('(?m)^Bnd-LastModified: \\d+$\r\n', '')
     }
 
     @Issue(1)
@@ -209,7 +208,7 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Re-executes 'jar' when manifest has been changed"() {
         when:
         executeGradleCommand 'clean jar'
-        buildScript.toFile().append '\nbundle { instructions << ["Built-By": "xyz"] }'
+        buildScript.append '\nbundle { instructions << ["Built-By": "xyz"] }'
         executeGradleCommand 'jar'
 
         then:
@@ -219,10 +218,10 @@ class BundlePluginIntegrationSpec extends Specification {
     @Issue(8)
     def "Uses instructions (Private-Package) from an included file"() {
         setup:
-        projectDir.resolve('bnd.bnd').toFile().write 'Private-Package: org.springframework.*'
+        resolve(projectDir, 'bnd.bnd').write 'Private-Package: org.springframework.*'
 
         when:
-        buildScript.toFile().append """
+        buildScript.append """
             dependencies { compile "org.springframework:spring-instrument:4.0.6.RELEASE" }
             bundle { instruction "-include", "${projectDir}/bnd.bnd" }"""
         executeGradleCommand 'clean jar'
@@ -236,10 +235,10 @@ class BundlePluginIntegrationSpec extends Specification {
         def resource = 'test-resource.txt'
 
         setup:
-        projectDir.resolve(resource).toFile().write 'this resource should be included'
+        resolve(projectDir, resource).write 'this resource should be included'
 
         when:
-        buildScript.toFile().append "\nbundle { instruction 'Include-Resource', '${projectDir}/${resource}' }"
+        buildScript.append "\nbundle { instruction 'Include-Resource', '${projectDir}/${resource}' }"
         executeGradleCommand 'clean jar'
 
         then:
@@ -251,14 +250,28 @@ class BundlePluginIntegrationSpec extends Specification {
         def resource = 'test-resource.txt'
 
         setup:
-        projectDir.resolve(resource).toFile().write 'this resource should be included'
+        resolve(projectDir, resource).write 'this resource should be included'
 
         when:
-        buildScript.toFile().append "\nbundle { instruction '-includeresource', '${projectDir}/${resource}' }"
+        buildScript.append "\nbundle { instruction '-includeresource', '${projectDir}/${resource}' }"
         executeGradleCommand 'clean jar'
 
         then:
         jarContains resource
+    }
+
+    private static File createTempDir() {
+        def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
+        temp.mkdirs()
+        temp
+    }
+
+    private static File resolve(File dir, String path) {
+        new File(dir, path)
+    }
+
+    private static File resolve(String dir, String path) {
+        new File(dir, path)
     }
 
     private def executeGradleCommand(cmd) {
@@ -280,7 +293,7 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private ZipFile getJarFile() {
-        new ZipFile(projectDir.resolve(jarName ?: "build/libs/${projectDir.fileName}.jar").toFile())
+        new ZipFile(resolve(projectDir, jarName ?: "build/libs/${projectDir.name}.jar"))
     }
 
     private def jarContains(String entry) {
