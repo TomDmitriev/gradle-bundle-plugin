@@ -17,7 +17,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:bundle:0.3'
+        classpath 'org.dm.gradle:bundle:0.4'
     }
 }
 

@@ -15,7 +15,7 @@ apply plugin: 'groovy'
 apply plugin: 'nexus'
 
 group = 'org.dm.gradle'
-version = '0.3'
+version = '0.4'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
