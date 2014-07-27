@@ -4,7 +4,6 @@ import spock.lang.Shared
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -276,13 +275,13 @@ class BundlePluginIntegrationSpec extends Specification {
 
     private def executeGradleCommand(cmd) {
 		def command = isWindows() ? "cmd /c " : ""
-		command = command + "gradle $cmd -b $projectDir/build.gradle"
+		command += "gradle $cmd -b $projectDir/build.gradle"
 		
-		def out = new StringBuilder();
-		def err = new StringBuilder();
+		def out = new StringBuilder()
+		def err = new StringBuilder()
 		
         def process = command.execute()
-		process.waitForProcessOutput( out, err )
+		process.waitForProcessOutput(out, err)
 
         stdout = out.toString()
         stderr = err.toString()
@@ -290,7 +289,7 @@ class BundlePluginIntegrationSpec extends Specification {
         assert process.exitValue() == 0: stderr
     }
 	
-	private def isWindows(){
+	private static def isWindows() {
 		System.getProperty("os.name").toLowerCase() ==~ /win.*/ 
 	}
 

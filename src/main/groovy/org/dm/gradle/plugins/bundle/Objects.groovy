@@ -1,6 +1,9 @@
 package org.dm.gradle.plugins.bundle
 
-class Objects {
+final class Objects {
+    private Objects() {
+        throw new AssertionError()
+    }
 
 	def static <T> T requireNonNull(T t) {
 		requireNonNull(t, null)
