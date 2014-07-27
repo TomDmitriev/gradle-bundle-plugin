@@ -10,8 +10,7 @@ import java.util.jar.Manifest
 
 import static aQute.bnd.osgi.Constants.INCLUDERESOURCE
 import static aQute.bnd.osgi.Constants.INCLUDE_RESOURCE
-import static java.nio.file.Files.createDirectories as createDirs
-import static java.util.Objects.requireNonNull
+import static org.dm.gradle.plugins.bundle.Objects.requireNonNull
 
 /**
  * A jar generator, which is basically a wrapper
@@ -109,7 +108,7 @@ class JarBuilder {
     void writeJarTo(File output) {
         build()
 
-        createDirs output.toPath().parent
+        output.getParentFile().mkdirs()
         jar.write output
     }
 

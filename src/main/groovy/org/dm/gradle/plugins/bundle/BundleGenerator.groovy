@@ -3,7 +3,7 @@ package org.dm.gradle.plugins.bundle
 import org.gradle.api.Action
 import org.gradle.api.tasks.bundling.Jar
 
-import static java.util.Objects.requireNonNull
+import static org.dm.gradle.plugins.bundle.Objects.requireNonNull
 import static org.dm.gradle.plugins.bundle.BundleUtils.*
 
 /**
