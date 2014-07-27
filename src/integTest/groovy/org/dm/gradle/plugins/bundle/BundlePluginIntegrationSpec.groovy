@@ -275,14 +275,24 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private def executeGradleCommand(cmd) {
-        def process = "gradle $cmd -b $projectDir/build.gradle".execute()
-        process.waitFor()
+		def command = isWindows() ? "cmd /c " : ""
+		command = command + "gradle $cmd -b $projectDir/build.gradle"
+		
+		def out = new StringBuilder();
+		def err = new StringBuilder();
+		
+        def process = command.execute()
+		process.waitForProcessOutput( out, err )
 
-        stdout = process.in.text
-        stderr = process.err.text
+        stdout = out.toString()
+        stderr = err.toString()
 
         assert process.exitValue() == 0: stderr
     }
+	
+	private def isWindows(){
+		System.getProperty("os.name").toLowerCase() ==~ /win.*/ 
+	}
 
     private def manifestContains(String line) {
         manifest =~ "(?m)^$line\$"
