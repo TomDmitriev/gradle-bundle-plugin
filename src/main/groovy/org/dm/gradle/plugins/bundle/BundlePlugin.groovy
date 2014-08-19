@@ -24,7 +24,7 @@ class BundlePlugin implements Plugin<Project> {
                 def jarBuilderFactory = new JarBuilderFactoryDecorator(
                         jarTask, project.bundle.jarBuilderFactory)
 
-                actions = [new BundleGenerator(jarBuilderFactory)]
+                doLast(new BundleGenerator(jarBuilderFactory))
                 manifest = new ManifestSubstitute(jarBuilderFactory, manifest)
             }
         }

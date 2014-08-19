@@ -30,6 +30,7 @@ class BundlePluginIntegrationSpec extends Specification {
         def javaSrc = resolve(projectDir, 'src/main/java/org/foo/bar')
         javaSrc.mkdirs()
         resolve(javaSrc, 'TestActivator.java').write getClass().classLoader.getResource('TestActivator.java').text
+        resolve(javaSrc, 'TestComponent.java').write getClass().classLoader.getResource('TestComponent.java').text
         resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
     }
 
@@ -258,6 +259,16 @@ class BundlePluginIntegrationSpec extends Specification {
         then:
         jarContains resource
     }
+	
+	@Issue(13)
+	def "Supports -dsannotations directive"() {
+		when:
+		buildScript.append '\nbundle { instructions << ["-dsannotations": "*"] }'
+		executeGradleCommand 'clean jar'
+
+		then:
+		jarContains 'OSGI-INF/org.foo.bar.TestComponent.xml'
+	}
 
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())

@@ -17,6 +17,7 @@ repositories {
 
 dependencies {
     compile 'org.eclipse:osgi:3.9.1-v20130814-1242'
+    compile 'org.osgi:org.osgi.compendium:5.0.0'
 }
 
 bundle {
