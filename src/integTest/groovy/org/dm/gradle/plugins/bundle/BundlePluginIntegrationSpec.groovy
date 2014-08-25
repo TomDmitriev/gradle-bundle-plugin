@@ -11,9 +11,6 @@ import java.util.zip.ZipFile
  * A set of integration tests. The routine of each test is
  * to execute gradle tasks against a test project and look
  * at the result (e.g. contents of the produced jar).
- * <p/>
- * Currently the tests may only be run in a Unix OS with
- * the plugin deployed in the local maven repo.
  */
 class BundlePluginIntegrationSpec extends Specification {
     @Shared
@@ -27,10 +24,17 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private void createSources() {
-        def javaSrc = resolve(projectDir, 'src/main/java/org/foo/bar')
         javaSrc.mkdirs()
-        resolve(javaSrc, 'TestActivator.java').write getClass().classLoader.getResource('TestActivator.java').text
+        copyFromResources('TestActivator.java')
         resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
+    }
+
+    private File getJavaSrc() {
+        resolve(projectDir, 'src/main/java/org/foo/bar')
+    }
+
+    private copyFromResources(String name) {
+        resolve(javaSrc, name).write getClass().classLoader.getResource(name).text
     }
 
     void setup() {
@@ -259,6 +263,22 @@ class BundlePluginIntegrationSpec extends Specification {
         jarContains resource
     }
 
+    @Issue(13)
+    def "Supports -dsannotations directive"() {
+        setup:
+        copyFromResources('TestComponent.java')
+
+        when:
+        buildScript.append """
+            dependencies { compile 'org.osgi:org.osgi.compendium:5.0.0' }
+            bundle { instructions << ["-dsannotations": "*"] }"""
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifestContains 'Service-Component: OSGI-INF/org.foo.bar.TestComponent.xml'
+        jarContains 'OSGI-INF/org.foo.bar.TestComponent.xml'
+    }
+    
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
         temp.mkdirs()
