@@ -280,6 +280,15 @@ class BundlePluginIntegrationSpec extends Specification {
         manifestContains 'Service-Component: OSGI-INF/org.foo.bar.TestComponent.xml'
         jarContains 'OSGI-INF/org.foo.bar.TestComponent.xml'
     }
+
+	def "jar task actions only contains bundle generator action"() {
+		when:
+		buildScript.append "task actionscheck { doLast { println jar.actions.size() + \" \" + jar.actions[0].@action.getClass().getSimpleName() } }"
+		executeGradleCommand 'actionscheck'
+
+		then:
+		stdout =~ /1 BundleGenerator/
+	}
     
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
