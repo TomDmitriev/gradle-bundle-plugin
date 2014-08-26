@@ -17,6 +17,8 @@ class BundlePluginIntegrationSpec extends Specification {
     File projectDir = createTempDir()
     @Shared
     File buildScript = resolve(projectDir, 'build.gradle')
+    @Shared
+    String gradleHome = System.getProperty("gradle.home")
     String stdout, stderr, jarName
 
     void setupSpec() {
@@ -295,7 +297,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     private def executeGradleCommand(cmd) {
 		def command = isWindows() ? "cmd /c " : ""
-		command += "gradle $cmd -b $projectDir/build.gradle"
+		command += "${gradleHome}/bin/gradle $cmd -b $projectDir/build.gradle"
 		
 		def out = new StringBuilder()
 		def err = new StringBuilder()
