@@ -22,6 +22,9 @@ class BundlePluginIntegrationSpec extends Specification {
     String stdout, stderr, jarName
 
     void setupSpec() {
+        if (!gradleHome) {
+            throw new IllegalStateException('System property "gradle.home" is not set')
+        }
         createSources()
     }
 
