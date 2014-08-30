@@ -7,6 +7,9 @@ import spock.lang.Specification
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
+
 /**
  * A set of integration tests. The routine of each test is
  * to execute gradle tasks against a test project and look
@@ -20,6 +23,7 @@ class BundlePluginIntegrationSpec extends Specification {
     @Shared
     String gradleHome = System.getProperty("gradle.home")
     String stdout, stderr, jarName
+    Logger LOG = Logging.getLogger(BundlePluginIntegrationSpec.class)
 
     void setupSpec() {
         if (!gradleHome) {
@@ -283,7 +287,16 @@ class BundlePluginIntegrationSpec extends Specification {
         manifestContains 'Service-Component: OSGI-INF/org.foo.bar.TestComponent.xml'
         jarContains 'OSGI-INF/org.foo.bar.TestComponent.xml'
     }
-    
+
+    def "jar task actions only contains bundle generator action"() {
+        when:
+        buildScript.append "task actionscheck { doLast { println jar.actions.size() + \" \" + jar.actions[0].@action.getClass().getSimpleName() } }"
+        executeGradleCommand 'actionscheck'
+
+        then:
+        stdout =~ /1 BundleGenerator/
+    }
+
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
         temp.mkdirs()
@@ -310,6 +323,9 @@ class BundlePluginIntegrationSpec extends Specification {
 
         stdout = out.toString()
         stderr = err.toString()
+
+        LOG.info stdout
+        LOG.error stderr
 
         assert process.exitValue() == 0: stderr
     }
