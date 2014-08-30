@@ -41,10 +41,14 @@ dependencies {
 
     compile 'biz.aQute.bnd:bndlib:2.3.0'
 
-    if (project.getGradle().gradleVersion.startsWith('2'))
-        testCompile 'org.spockframework:spock-core:1.0-groovy-2.3-SNAPSHOT'
-    else
+    if (project.getGradle().gradleVersion.startsWith('2')) {
+        testCompile('org.spockframework:spock-core:1.0-groovy-2.3-SNAPSHOT') {
+            exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        }
+        testCompile 'org.codehaus.groovy:groovy-all:2.3.3'
+    } else {
         testCompile 'org.spockframework:spock-core:1.0-groovy-1.8-SNAPSHOT'
+    }
 
     testRuntime 'cglib:cglib-nodep:3.1'
 
