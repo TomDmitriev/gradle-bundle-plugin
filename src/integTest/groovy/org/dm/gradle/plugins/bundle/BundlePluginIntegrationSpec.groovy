@@ -288,7 +288,7 @@ class BundlePluginIntegrationSpec extends Specification {
         jarContains 'OSGI-INF/org.foo.bar.TestComponent.xml'
     }
 
-    def "jar task actions only contains bundle generator action"() {
+    def "jar task actions contain only a bundle generator action"() {
         when:
         buildScript.append "task actionscheck { doLast { println jar.actions.size() + \" \" + jar.actions[0].@action.getClass().getSimpleName() } }"
         executeGradleCommand 'actionscheck'
