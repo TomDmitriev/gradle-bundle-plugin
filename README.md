@@ -1,5 +1,9 @@
 # Gradle Bundle Plugin
 
+[![Maintainer Status](http://stillmaintained.com/TomDmitriev/gradle-bundle-plugin.png)](http://stillmaintained.com/TomDmitriev/gradle-bundle-plugin)
+[![Build Status](https://travis-ci.org/TomDmitriev/gradle-bundle-plugin.svg?branch=master)](https://travis-ci.org/TomDmitriev/gradle-bundle-plugin)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+
 Gradle Bundle Plugin allows you to create OSGI bundles. Its main difference from the 
 [Gradle OSGI Plugin](http://www.gradle.org/docs/current/userguide/osgi_plugin.html)
 is that it uses [the bnd tool](http://www.aqute.biz/Bnd/Bnd) to generate not only a
