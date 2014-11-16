@@ -41,11 +41,11 @@ dependencies {
 
     compile 'biz.aQute.bnd:bndlib:2.4.0'
 
-    if (project.getGradle().gradleVersion.startsWith('2')) {
+    if (gradle.gradleVersion.startsWith('2')) {
         testCompile('org.spockframework:spock-core:1.0-groovy-2.3-SNAPSHOT') {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
-        testCompile "org.codehaus.groovy:groovy-all:${project.properties['groovy.version']?:'2.3.6'}"
+        testCompile "org.codehaus.groovy:groovy-all:${project.hasProperty('groovy.version') ? project.getProperty('groovy.version') : '2.3.6'}"
     } else {
         testCompile 'org.spockframework:spock-core:1.0-groovy-1.8-SNAPSHOT'
     }
