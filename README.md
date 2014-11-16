@@ -21,11 +21,11 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.5'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.6'
     }
 }
 
-apply plugin: 'bundle'
+apply plugin: 'org.dm.bundle'
 
 ```
 

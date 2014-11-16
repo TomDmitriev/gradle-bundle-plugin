@@ -1,24 +1,24 @@
 buildscript {
     repositories {
-        mavenCentral()
-
-        jcenter()
+        maven { url 'http://jcenter.bintray.com' }
     }
 
     dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6'
     }
 }
 
 apply plugin: 'eclipse'
 apply plugin: 'groovy'
-apply plugin: 'nexus'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 group = 'org.dm.gradle'
-version = '0.5'
+version = '0.6'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+def compatibilityVersion = 1.6
+sourceCompatibility = compatibilityVersion
+targetCompatibility = compatibilityVersion
 
 repositories {
     mavenCentral()
@@ -33,19 +33,19 @@ sourceSets {
     }
 }
 
-[compileJava, compileTestJava, compileIntegTestJava]*.options*.encoding = 'UTF-8'
+tasks.matching { it.name ==~ /compile\w*/ }*.options*.encoding = 'UTF-8'
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile 'biz.aQute.bnd:bndlib:2.3.0'
+    compile 'biz.aQute.bnd:bndlib:2.4.0'
 
     if (project.getGradle().gradleVersion.startsWith('2')) {
         testCompile('org.spockframework:spock-core:1.0-groovy-2.3-SNAPSHOT') {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
-        testCompile 'org.codehaus.groovy:groovy-all:2.3.3'
+        testCompile "org.codehaus.groovy:groovy-all:${project.properties['groovy.version']?:'2.3.6'}"
     } else {
         testCompile 'org.spockframework:spock-core:1.0-groovy-1.8-SNAPSHOT'
     }
@@ -63,45 +63,98 @@ task integTest(type: Test, dependsOn: classes) {
     reports.html.destination = file("$buildDir/reports/integTests")
     reports.junitXml.destination = file("$buildDir/integTest-results")
     binResultsDir = file("${reports.junitXml.destination}/binary/integTest")
-    systemProperty "gradle.home", project.getGradle().getGradleHomeDir()
+    systemProperty "gradle.home", gradle.gradleHomeDir
 }
 
 check.dependsOn integTest
 
 
-modifyPom {
-    project {
-        name 'Gradle Bundle Plugin'
-        packaging 'jar'
-        description 'Gradle plugin to generate OSGI bundles.'
-        url 'https://github.com/TomDmitriev/gradle-bundle-plugin'
-        inceptionYear '2014'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Bundle Plugin',
+                'Implementation-Version': version,
+                'Built-By': System.getProperty('user.name'),
+                'Built-Date': new Date(),
+                'Built-JDK': System.getProperty('java.version'),
+                'Built-Gradle': gradle.gradleVersion
+    }
+}
 
-        scm {
-            url 'scm:https://github.com/TomDmitriev/gradle-bundle-plugin.git'
-            connection 'scm:https://github.com/TomDmitriev/gradle-bundle-plugin.git'
-            developerConnection 'scm:https://github.com/TomDmitriev/gradle-bundle-plugin.git'
-        }
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
 
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    classifier 'groovydoc'
+    from groovydoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives groovydocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact groovydocJar
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('name', 'Gradle Bundle Plugin')
+                root.appendNode('description', 'Gradle plugin to generate OSGI bundles.')
+                root.appendNode('url', "https://github.com/TomDmitriev/${project.name}")
+                root.appendNode('inceptionYear', '2014')
+                def scm = root.appendNode('scm')
+                scm.appendNode('url', "https://github.com/TomDmitriev/${project.name}")
+                scm.appendNode('connection', "scm:https://github.com/TomDmitriev/${project.name}.git")
+                scm.appendNode('developerConnection', "scm:git://github.com/TomDmitriev/${project.name}.git")
+                def license = root.appendNode('licenses').appendNode('license')
+                license.appendNode('name', 'The Apache Software License, Version 2.0')
+                license.appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+                license.appendNode('distribution', 'repo')
+                def developers = root.appendNode('developers')
+                def dev = developers.appendNode('developer')
+                dev.appendNode('id', 'TomDmitriev')
+                dev.appendNode('name', 'Artyom Dmitriev')
+                dev.appendNode('email', 'dm.artyom@gmail.com')
             }
         }
+    }
+}
 
-        developers {
-            developer {
-                id 'TomDmitriev'
-                name 'Artyom Dmitriev'
+bintray {
+    user = project.properties['bintray.user.name']
+    key = project.properties['bintray.api.key']
+
+    publications = ['mavenJava']
+
+    publish = true
+    pkg {
+        repo = 'gradle-plugins'
+        name = 'org.dm.bundle'
+        desc = 'Gradle Bundle Plugin allows you to create OSGI bundles.'
+        websiteUrl = "https://github.com/TomDmitriev/${project.name}"
+        issueTrackerUrl = "https://github.com/TomDmitriev/${project.name}/issues"
+        vcsUrl = "https://github.com/TomDmitriev/${project.name}.git"
+        licenses = ['Apache-2.0']
+        labels = ['gradle', 'bnd', 'bundle', 'osgi']
+        publicDownloadNumbers = true
+        version {
+            vcsTag = "v$project.version"
+            attributes = ['gradle-plugin': "org.dm.gradle:${project.group}:${project.name}"]
+            gpg {
+                sign = true
+                passphrase = project.properties['signing.password']
             }
         }
     }
 }
 
 eclipse.classpath.file {
-    whenMerged {  cp ->
+    whenMerged { cp ->
         cp.entries.removeAll { (it.kind == "src") && (it.path =~ /resources/) }
     }
 }

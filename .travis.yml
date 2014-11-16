@@ -1,2 +1,2 @@
 language: java
-script: gradle test integTest -i
+script: gradle test integTest -i -Pgroovy.version=2.3.3

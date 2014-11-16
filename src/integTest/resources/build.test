@@ -8,7 +8,7 @@ buildscript {
         classpath 'org.dm.gradle:gradle-bundle-plugin:latest.integration'
     }
 }
-apply plugin: 'bundle'
+apply plugin: 'org.dm.bundle'
 apply plugin: 'java'
 
 repositories {
