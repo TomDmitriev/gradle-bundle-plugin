@@ -87,3 +87,22 @@ bundle {
     trace = true
 }
 ```
+
+### Gradle 1.x support
+The current version of plugin assumes Gradle 2.x is used. The last version that supports
+Gradle 1.x is 0.5, which can be added to your script as follows
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.5'
+    }
+}
+
+apply plugin: 'bundle'
+
+```
