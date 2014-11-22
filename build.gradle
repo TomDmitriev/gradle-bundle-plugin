@@ -14,7 +14,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'org.dm.gradle'
-version = '0.6'
+version = '0.6.1'
 
 def compatibilityVersion = 1.6
 sourceCompatibility = compatibilityVersion
@@ -86,9 +86,15 @@ task groovydocJar(type: Jar, dependsOn: groovydoc) {
     from groovydoc.destinationDir
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier 'javadoc'
+    from javadoc.destinationDir
+}
+
 artifacts {
     archives sourcesJar
     archives groovydocJar
+    archives javadocJar
 }
 
 publishing {
@@ -97,6 +103,7 @@ publishing {
             from components.java
             artifact sourcesJar
             artifact groovydocJar
+            artifact javadocJar
             pom.withXml {
                 def root = asNode()
                 root.appendNode('name', 'Gradle Bundle Plugin')
@@ -127,6 +134,7 @@ bintray {
 
     publications = ['mavenJava']
 
+    dryRun = false
     publish = true
     pkg {
         repo = 'gradle-plugins'
@@ -140,7 +148,7 @@ bintray {
         publicDownloadNumbers = true
         version {
             vcsTag = "v$project.version"
-            attributes = ['gradle-plugin': "org.dm.gradle:${project.group}:${project.name}"]
+            attributes = ['gradle-plugin': "org.dm.bundle:${project.group}:${project.name}"]
             gpg {
                 sign = true
                 passphrase = project.properties['signing.password']
