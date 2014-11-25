@@ -50,6 +50,10 @@ class BundlePluginIntegrationSpec extends Specification {
         resolve(javaSrc, name).write getClass().classLoader.getResource(path).text
     }
 
+    private copyToProject(String name) {
+        resolve(projectDir, name).write getClass().classLoader.getResource(name).text
+    }
+
     void setup() {
         buildScript.write getClass().classLoader.getResource('build.test').text
     }
@@ -274,6 +278,20 @@ class BundlePluginIntegrationSpec extends Specification {
 
         then:
         jarContains resource
+    }
+
+    @Issue(22)
+    def "-include instruction expects baseDir to be correct"() {
+        setup:
+        copyToProject('bnd.bnd')
+        copyToProject('includedResource')
+
+        when:
+        buildScript.append '\nbundle { instructions << ["-include": "bnd.bnd"] }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        jarContains 'includedResource'
     }
 
     @Issue(13)
