@@ -34,7 +34,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     private void createSources() {
         javaSrc.mkdirs()
-        copyFromResources('TestActivator.java')
+        copyFromResources('TestActivator.java', 'org/foo/bar/TestActivator.java')
         resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
     }
 
@@ -44,6 +44,10 @@ class BundlePluginIntegrationSpec extends Specification {
 
     private copyFromResources(String name) {
         resolve(javaSrc, name).write getClass().classLoader.getResource(name).text
+    }
+
+    private copyFromResources(String name, String path) {
+        resolve(javaSrc, name).write getClass().classLoader.getResource(path).text
     }
 
     void setup() {
@@ -275,7 +279,7 @@ class BundlePluginIntegrationSpec extends Specification {
     @Issue(13)
     def "Supports -dsannotations directive"() {
         setup:
-        copyFromResources('TestComponent.java')
+        copyFromResources('TestComponent.java', 'org/foo/bar/TestComponent.java')
 
         when:
         buildScript.append """
