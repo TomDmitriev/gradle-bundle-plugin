@@ -34,7 +34,7 @@ class BundlePluginIntegrationSpec extends Specification {
 
     private void createSources() {
         javaSrc.mkdirs()
-        copyFromResources('TestActivator.java')
+        copyFromResources('TestActivator.java', 'org/foo/bar/TestActivator.java')
         resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
     }
 
@@ -44,6 +44,14 @@ class BundlePluginIntegrationSpec extends Specification {
 
     private copyFromResources(String name) {
         resolve(javaSrc, name).write getClass().classLoader.getResource(name).text
+    }
+
+    private copyFromResources(String name, String path) {
+        resolve(javaSrc, name).write getClass().classLoader.getResource(path).text
+    }
+
+    private copyToProject(String name) {
+        resolve(projectDir, name).write getClass().classLoader.getResource(name).text
     }
 
     void setup() {
@@ -272,10 +280,24 @@ class BundlePluginIntegrationSpec extends Specification {
         jarContains resource
     }
 
+    @Issue(22)
+    def "-include instruction expects baseDir to be correct"() {
+        setup:
+        copyToProject('bnd.bnd')
+        copyToProject('includedResource')
+
+        when:
+        buildScript.append '\nbundle { instructions << ["-include": "bnd.bnd"] }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        jarContains 'includedResource'
+    }
+
     @Issue(13)
     def "Supports -dsannotations directive"() {
         setup:
-        copyFromResources('TestComponent.java')
+        copyFromResources('TestComponent.java', 'org/foo/bar/TestComponent.java')
 
         when:
         buildScript.append """
