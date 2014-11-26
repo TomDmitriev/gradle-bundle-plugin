@@ -46,6 +46,10 @@ final class BundleUtils {
         project.configurations.runtime.files
     }
 
+    static File getBase(Project project) {
+        project.buildFile.getParentFile()
+    }
+
     static File[] getSources(Project project) {
         project.sourceSets.main.allSource.srcDirs.findAll {
             it.exists()
