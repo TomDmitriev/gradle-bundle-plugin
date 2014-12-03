@@ -162,3 +162,7 @@ eclipse.classpath.file {
         cp.entries.removeAll { (it.kind == "src") && (it.path =~ /resources/) }
     }
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
