@@ -14,7 +14,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'org.dm.gradle'
-version = '0.6.1'
+version = '0.6.2'
 
 def compatibilityVersion = 1.6
 sourceCompatibility = compatibilityVersion

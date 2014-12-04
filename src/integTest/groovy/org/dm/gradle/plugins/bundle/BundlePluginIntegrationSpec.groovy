@@ -293,6 +293,20 @@ class BundlePluginIntegrationSpec extends Specification {
         manifestContains 'Bundle-Description: Bundle Description Test'
     }
 
+    @Issue(24)
+    def "bndlib can read system properties"() {
+        when:
+        copyToProject('include.txt')
+        copyToProject('gradle.properties')
+
+        buildScript.append """
+            bundle { instructions << ["-include": "bnd.bnd"] }"""
+        executeGradleCommand 'clean jar'
+
+        then:
+        jarContains 'include.txt'
+    }
+
     @Issue(13)
     def "Supports -dsannotations directive"() {
         setup:

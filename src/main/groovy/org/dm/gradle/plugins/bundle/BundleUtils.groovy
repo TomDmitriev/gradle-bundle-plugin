@@ -27,9 +27,14 @@ final class BundleUtils {
     }
 
     static def getProperties(Jar jarTask) {
-        attributes(jarTask.manifest) + jarTask.project.bundle.instructions.collectEntries { key, value ->
+        def attrs = attributes(jarTask.manifest)
+        def entries = jarTask.project.bundle.instructions.collectEntries { key, value ->
             [key, value as String]
         }
+        def stringProps = jarTask.project.properties.findAll {
+            it.value instanceof String
+        }
+        attrs + entries + stringProps
     }
 
     //Visible for testing
