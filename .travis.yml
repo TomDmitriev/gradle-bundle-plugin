@@ -1,2 +1,2 @@
 language: java
-script: gradle test integTest -i -Pgroovy.version=2.3.3
+script: gradle publishToMavenLocal test integTest -i -Pgroovy.version=2.3.3
