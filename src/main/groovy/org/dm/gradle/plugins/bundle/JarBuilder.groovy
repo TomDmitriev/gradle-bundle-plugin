@@ -67,6 +67,11 @@ class JarBuilder {
         this
     }
 
+    JarBuilder withBase(base) {
+        builder.setBase base
+        this
+    }
+
     JarBuilder withSourcepath(files) {
         builder.sourcepath = files as File[]
         this

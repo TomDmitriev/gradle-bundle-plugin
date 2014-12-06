@@ -1,0 +1,2 @@
+Bundle-Description: Bundle Description Test
+Include-Resource: ${includeRes}

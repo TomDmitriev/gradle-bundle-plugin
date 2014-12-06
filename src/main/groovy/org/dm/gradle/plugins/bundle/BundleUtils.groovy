@@ -27,9 +27,14 @@ final class BundleUtils {
     }
 
     static def getProperties(Jar jarTask) {
-        attributes(jarTask.manifest) + jarTask.project.bundle.instructions.collectEntries { key, value ->
+        def attrs = attributes(jarTask.manifest)
+        def entries = jarTask.project.bundle.instructions.collectEntries { key, value ->
             [key, value as String]
         }
+        def stringProps = jarTask.project.properties.findAll {
+            it.value instanceof String
+        }
+        attrs + entries + stringProps
     }
 
     //Visible for testing
@@ -44,6 +49,10 @@ final class BundleUtils {
 
     static File[] getClasspath(Project project) {
         project.configurations.runtime.files
+    }
+
+    static File getBase(Project project) {
+        project.buildFile.getParentFile()
     }
 
     static File[] getSources(Project project) {
