@@ -21,14 +21,10 @@ class BundlePluginIntegrationSpec extends Specification {
     @Shared
     File buildScript = resolve(projectDir, 'build.gradle')
     @Shared
-    String gradleHome = System.getProperty("gradle.home")
     String stdout, stderr, jarName
     Logger LOG = Logging.getLogger(BundlePluginIntegrationSpec.class)
 
     void setupSpec() {
-        if (!gradleHome) {
-            throw new IllegalStateException('System property "gradle.home" is not set')
-        }
         createSources()
     }
 
@@ -55,6 +51,7 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     void setup() {
+        jarName = null
         buildScript.write getClass().classLoader.getResource('build.test').text
     }
 
@@ -347,8 +344,8 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private def executeGradleCommand(cmd) {
-		def command = isWindows() ? "cmd /c " : ""
-		command += "${gradleHome}/bin/gradle $cmd -b $projectDir/build.gradle"
+		def command = isWindows() ? "cmd /c gradlew.bat " : "./gradlew "
+		command += "${cmd} -b $projectDir/build.gradle"
 		
 		def out = new StringBuilder()
 		def err = new StringBuilder()
