@@ -46,7 +46,6 @@ class JarBuilder {
 
     JarBuilder withResources(files) {
         addToResources files
-        builder.addClasspath files as Collection<File>
         this
     }
 
