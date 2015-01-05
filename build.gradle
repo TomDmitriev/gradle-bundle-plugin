@@ -59,7 +59,6 @@ task integTest(type: Test, dependsOn: classes) {
     reports.html.destination = file("$buildDir/reports/integTests")
     reports.junitXml.destination = file("$buildDir/integTest-results")
     binResultsDir = file("${reports.junitXml.destination}/binary/integTest")
-    systemProperty "gradle.home", gradle.gradleHomeDir
 }
 
 check.dependsOn integTest
