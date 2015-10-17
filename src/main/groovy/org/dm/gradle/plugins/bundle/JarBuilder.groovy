@@ -78,7 +78,7 @@ class JarBuilder {
     }
 
     JarBuilder withProperties(properties) {
-        builder.properties = properties
+        builder.properties = properties as Properties
         this
     }
 
