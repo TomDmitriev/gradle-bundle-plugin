@@ -1,10 +1,12 @@
 buildscript {
     repositories {
         maven { url 'http://jcenter.bintray.com' }
+        maven { url 'https://plugins.gradle.org/m2/' }
     }
 
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.3.1'
+        classpath 'com.gradle.publish:plugin-publish-plugin:0.9.1'
     }
 }
 
@@ -12,6 +14,7 @@ apply plugin: 'eclipse'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.gradle.plugin-publish'
 
 group = 'org.dm.gradle'
 version = '0.6.3'
@@ -21,6 +24,8 @@ sourceCompatibility = compatibilityVersion
 targetCompatibility = compatibilityVersion
 
 repositories {
+    jcenter()
+
     mavenCentral()
 
     maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
@@ -152,6 +157,20 @@ bintray {
                 sign = true
                 passphrase = project.properties['signing.password']
             }
+        }
+    }
+}
+
+pluginBundle {
+    website = "https://github.com/TomDmitriev/${project.name}"
+    vcsUrl = "https://github.com/TomDmitriev/${project.name}.git"
+    description = 'Gradle Bundle Plugin allows you to create OSGI bundles.'
+    tags = ['bnd', 'bundle', 'osgi']
+
+    plugins {
+        greetingsPlugin {
+            id = 'org.dm.bundle'
+            displayName = 'Gradle Bundle plugin'
         }
     }
 }
