@@ -111,10 +111,16 @@ class JarBuilder {
     }
 
     void writeJarTo(File output) {
-        build()
+        try {
+            build()
 
-        output.getParentFile().mkdirs()
-        jar.write output
+            output.getParentFile().mkdirs()
+            jar.write output
+        } finally {
+            if (jar != null) {
+                jar.close()
+            }
+        }
     }
 
     private void traceClasspath() {
