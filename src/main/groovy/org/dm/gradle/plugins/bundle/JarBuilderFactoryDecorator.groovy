@@ -24,7 +24,7 @@ final class JarBuilderFactoryDecorator implements org.gradle.internal.Factory<Ja
         return jarBuilder = factory.create().
                 withBase(getBase(project)).
                 withProperties(getProperties(jarTask)).
-                withClasspath(getClasspath(project)).
+                withClasspath(getClasspath(jarTask)).
                 withSourcepath(getSources(project)).
                 withResources(getResources(project)).
                 withVersion(getVersion(project)).

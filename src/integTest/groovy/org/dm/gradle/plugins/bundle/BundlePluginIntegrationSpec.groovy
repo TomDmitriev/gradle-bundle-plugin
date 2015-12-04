@@ -31,8 +31,6 @@ class BundlePluginIntegrationSpec extends Specification {
     private void createSources() {
         javaSrc.mkdirs()
         resourceDir.mkdirs()
-        copyFromResources('TestActivator.java', 'org/foo/bar/TestActivator.java')
-        resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
     }
 
     private File getResourceDir() {
@@ -57,6 +55,11 @@ class BundlePluginIntegrationSpec extends Specification {
 
     void setup() {
         jarName = null
+        javaSrc.eachFileRecurse(groovy.io.FileType.FILES) { file ->
+            file.delete()
+        }
+        copyFromResources('TestActivator.java', 'org/foo/bar/TestActivator.java')
+        resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
         buildScript.write getClass().classLoader.getResource('build.test').text
     }
 
@@ -207,6 +210,15 @@ class BundlePluginIntegrationSpec extends Specification {
         stderr =~ /(?m)^# build$/
     }
 
+    def "jar task actions contain only a bundle generator action"() {
+        when:
+        buildScript.append "task actionscheck { doLast { println jar.actions.size() + \" \" + jar.actions[0].@action.getClass().getSimpleName() } }"
+        executeGradleCommand 'actionscheck'
+
+        then:
+        stdout =~ /1 BundleGenerator/
+    }
+
     @Issue(1)
     def "Saves manifest under build/tmp"() {
         when:
@@ -282,6 +294,22 @@ class BundlePluginIntegrationSpec extends Specification {
         jarContains resource
     }
 
+    @Issue(13)
+    def "Supports -dsannotations directive"() {
+        setup:
+        copyFromResources('TestComponent.java', 'org/foo/bar/TestComponent.java')
+
+        when:
+        buildScript.append """
+            dependencies { compile 'org.osgi:org.osgi.compendium:5.0.0' }
+            bundle { instructions << ["-dsannotations": "*"] }"""
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifestContains 'Service-Component: OSGI-INF/org.foo.bar.TestComponent.xml'
+        jarContains 'OSGI-INF/org.foo.bar.TestComponent.xml'
+    }
+
     @Issue(22)
     def "-include instruction expects baseDir to be correct"() {
         setup:
@@ -327,29 +355,20 @@ class BundlePluginIntegrationSpec extends Specification {
         manifest =~ /(?m)^Import-Package:.*org.apache.camel.*$/
     }
 
-    @Issue(13)
-    def "Supports -dsannotations directive"() {
+    @Issue(38)
+    def "Supports excludeDependencies"() {
         setup:
-        copyFromResources('TestComponent.java', 'org/foo/bar/TestComponent.java')
+        copyFromResources('AClass.java', 'org/foo/bar/AClass.java')
 
         when:
         buildScript.append """
-            dependencies { compile 'org.osgi:org.osgi.compendium:5.0.0' }
-            bundle { instructions << ["-dsannotations": "*"] }"""
+            dependencies { compile 'com.google.guava:guava:18.0' }
+            bundle { excludeDependencies << [module: 'guava'] }"""
         executeGradleCommand 'clean jar'
 
         then:
-        manifestContains 'Service-Component: OSGI-INF/org.foo.bar.TestComponent.xml'
-        jarContains 'OSGI-INF/org.foo.bar.TestComponent.xml'
-    }
-
-    def "jar task actions contain only a bundle generator action"() {
-        when:
-        buildScript.append "task actionscheck { doLast { println jar.actions.size() + \" \" + jar.actions[0].@action.getClass().getSimpleName() } }"
-        executeGradleCommand 'actionscheck'
-
-        then:
-        stdout =~ /1 BundleGenerator/
+        // com.google.common.hash is expected to have no version
+        manifest =~ /(?m)^Import-Package: com.google.common.hash,org.osgi.framework;version=.*$/
     }
 
     private static File createTempDir() {

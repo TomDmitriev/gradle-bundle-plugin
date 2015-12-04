@@ -6,6 +6,8 @@ package org.dm.gradle.plugins.bundle
 class BundleExtension {
     private final def instructions = [:]
 
+    private final def excludeDependencies = [:]
+
     boolean trace = false
 
     org.gradle.internal.Factory<JarBuilder> jarBuilderFactory = DefaultJarBuilderFactory.INSTANCE
@@ -24,5 +26,9 @@ class BundleExtension {
 
     def getInstructions() {
         return instructions
+    }
+
+    def getExcludeDependencies() {
+        return excludeDependencies
     }
 }

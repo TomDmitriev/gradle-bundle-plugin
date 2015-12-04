@@ -47,8 +47,14 @@ final class BundleUtils {
         }
     }
 
-    static File[] getClasspath(Project project) {
-        project.configurations.runtime.files
+    static File[] getClasspath(Jar jarTask) {
+        def project = jarTask.project
+        def configuration = project.configurations.runtime.copyRecursive()
+        def excludeDependencies = project.bundle.excludeDependencies
+        if (!excludeDependencies.isEmpty()) {
+            configuration.exclude(excludeDependencies)
+        }
+        configuration.files
     }
 
     static File getBase(Project project) {

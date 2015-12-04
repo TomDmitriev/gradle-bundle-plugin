@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.6.4'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.7'
     }
 }
 
@@ -80,11 +80,31 @@ will not include groovy or scala sources.
 
 ### Bnd tracing
 
-You can also enable bnd tracing by setting `bundle.trace` to true.
+You can enable bnd tracing by setting `bundle.trace` to true.
 
 ```groovy
 bundle {
     trace = true
+}
+```
+
+### Exclusion of dependencies from the classpath passed to Bnd
+
+This can be done using excludeDependencies property of bundle extension, for example:
+
+```groovy
+bundle {
+    excludeDependencies << [module: 'guava']
+}
+```
+
+### Blueprint support
+
+To enable blueprint support you need to pass the following instruction to Bnd:
+
+```groovy
+bundle {
+    instruction '-plugin', 'aQute.lib.spring.SpringXMLType'
 }
 ```
 
