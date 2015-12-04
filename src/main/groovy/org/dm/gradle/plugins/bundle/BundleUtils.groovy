@@ -51,8 +51,8 @@ final class BundleUtils {
         def project = jarTask.project
         def configuration = project.configurations.runtime.copyRecursive()
         def excludeDependencies = project.bundle.excludeDependencies
-        if (!excludeDependencies.isEmpty()) {
-            configuration.exclude(excludeDependencies)
+        excludeDependencies.each {
+            configuration.exclude(it)
         }
         configuration.files
     }

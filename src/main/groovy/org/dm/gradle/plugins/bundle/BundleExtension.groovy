@@ -6,7 +6,7 @@ package org.dm.gradle.plugins.bundle
 class BundleExtension {
     private final def instructions = [:]
 
-    private final def excludeDependencies = [:]
+    private final def excludeDependencies = []
 
     boolean trace = false
 
@@ -22,6 +22,10 @@ class BundleExtension {
         } else {
             instructions[name] = value
         }
+    }
+
+    def exclude(Map excludeDeps) {
+        excludeDependencies << excludeDeps
     }
 
     def getInstructions() {

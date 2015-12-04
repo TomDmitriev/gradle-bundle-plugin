@@ -363,7 +363,7 @@ class BundlePluginIntegrationSpec extends Specification {
         when:
         buildScript.append """
             dependencies { compile 'com.google.guava:guava:18.0' }
-            bundle { excludeDependencies << [module: 'guava'] }"""
+            bundle { exclude module: 'guava' }"""
         executeGradleCommand 'clean jar'
 
         then:

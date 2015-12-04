@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.7'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.7.1'
     }
 }
 
@@ -94,7 +94,8 @@ This can be done using excludeDependencies property of bundle extension, for exa
 
 ```groovy
 bundle {
-    excludeDependencies << [module: 'guava']
+    exclude module: 'guava'
+    exclude group: 'org.jmock'
 }
 ```
 
