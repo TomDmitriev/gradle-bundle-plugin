@@ -30,8 +30,13 @@ class BundlePluginIntegrationSpec extends Specification {
 
     private void createSources() {
         javaSrc.mkdirs()
+        resourceDir.mkdirs()
         copyFromResources('TestActivator.java', 'org/foo/bar/TestActivator.java')
         resolve(javaSrc, 'More.java').write 'package org.foo.bar;\n class More {}'
+    }
+
+    private File getResourceDir() {
+        resolve(projectDir, 'src/main/resources')
     }
 
     private File getJavaSrc() {
@@ -302,6 +307,24 @@ class BundlePluginIntegrationSpec extends Specification {
 
         then:
         jarContains 'include.txt'
+    }
+
+    @Issue(32)
+    def "Supports blueprint.xml"() {
+        setup:
+        def blueprintFileLocation = 'OSGI-INF/blueprint'
+        def blueprintFile = "$blueprintFileLocation/blueprint.xml"
+        resolve(resourceDir, blueprintFileLocation).mkdirs()
+        resolve(resourceDir, blueprintFile).write getClass().classLoader.getResource(blueprintFile).text
+
+        when:
+        buildScript.append """
+            dependencies { compile 'org.apache.camel:camel-core:2.15.2' }
+            bundle { instructions << ['-plugin': 'aQute.lib.spring.SpringXMLType'] }"""
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifest =~ /(?m)^Import-Package:.*org.apache.camel.*$/
     }
 
     @Issue(13)
