@@ -261,7 +261,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'clean jar'
 
         then:
-        manifestContains 'Private-Package: org.foo.bar,org.springframework.instrument'
+        manifestContains 'Private-Package: org.springframework.instrument,org.foo.bar'
     }
 
     @Issue(9)

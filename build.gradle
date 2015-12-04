@@ -17,7 +17,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.gradle.plugin-publish'
 
 group = 'org.dm.gradle'
-version = '0.6.4'
+version = '0.7'
 
 def compatibilityVersion = 1.6
 sourceCompatibility = compatibilityVersion
@@ -44,7 +44,7 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile 'biz.aQute.bnd:biz.aQute.bndlib:2.4.1'
+    compile 'biz.aQute.bnd:biz.aQute.bndlib:3.0.0'
 
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
