@@ -90,7 +90,7 @@ bundle {
 
 ### Exclusion of dependencies from the classpath passed to Bnd
 
-This can be done using exclude property of bundle extension, for example:
+This can be done using `exclude` property of bundle extension, for example:
 
 ```groovy
 bundle {
