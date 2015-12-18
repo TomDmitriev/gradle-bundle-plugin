@@ -371,6 +371,41 @@ class BundlePluginIntegrationSpec extends Specification {
         manifest =~ /(?m)^Import-Package: com.google.common.hash,org.osgi.framework;version=.*$/
     }
 
+    @Issue(41)
+    def "Produces an error when osgi plugin is applied"() {
+        when:
+        buildScript.append "apply plugin: 'osgi'"
+        executeGradleCommand 'clean jar', 1
+
+        then:
+        stderr.contains 'osgi'
+    }
+
+    @Issue(41)
+    def "Handles non-string keys and values in bundle instructions"() {
+        when:
+        buildScript.append 'ext {bar = \'bar\'}\ndef foo = "Foo"\n' +
+                'bundle { instructions << ["$foo": 123.5, \'Abc\': "$foo-${bar}"] }'
+        executeGradleCommand 'clean jar'
+        println "<$manifest>"
+
+        then:
+        manifestContains 'Foo: 123.5'
+        manifestContains 'Abc: Foo-bar'
+    }
+
+    @Issue(41)
+    def "Handles non-string values in jar manifest attributes"() {
+        when:
+        buildScript.append 'ext {bar = \'bar\'}\ndef foo = "Foo"\n' +
+                'jar { manifest { attributes "Xyz": "$foo-${bar}", \'Abc\': 123 } }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifestContains 'Xyz: Foo-bar'
+        manifestContains 'Abc: 123'
+    }
+
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
         temp.mkdirs()
@@ -385,7 +420,7 @@ class BundlePluginIntegrationSpec extends Specification {
         new File(dir, path)
     }
 
-    private def executeGradleCommand(cmd) {
+    private def executeGradleCommand(cmd, expectedExitStatus = 0) {
 		def command = isWindows() ? "cmd /c gradlew.bat " : "./gradlew "
 		command += "${cmd} -b $projectDir/build.gradle"
 		
@@ -401,7 +436,7 @@ class BundlePluginIntegrationSpec extends Specification {
         LOG.info stdout
         LOG.error stderr
 
-        assert process.exitValue() == 0: stderr
+        assert process.exitValue() == expectedExitStatus: '<' + process.exitValue() + '>'
     }
 	
 	private static def isWindows() {
