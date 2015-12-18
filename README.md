@@ -1,6 +1,5 @@
 # Gradle Bundle Plugin
 
-[![Maintainer Status](http://stillmaintained.com/TomDmitriev/gradle-bundle-plugin.png)](http://stillmaintained.com/TomDmitriev/gradle-bundle-plugin)
 [![Build Status](https://travis-ci.org/TomDmitriev/gradle-bundle-plugin.svg?branch=master)](https://travis-ci.org/TomDmitriev/gradle-bundle-plugin)
 [![Gradle Status](https://gradleupdate.appspot.com/TomDmitriev/gradle-bundle-plugin/status.svg?branch=master)](https://gradleupdate.appspot.com/TomDmitriev/gradle-bundle-plugin/status)
 [![Download](https://api.bintray.com/packages/tomdmitriev/gradle-plugins/org.dm.bundle/images/download.svg)](https://bintray.com/tomdmitriev/gradle-plugins/org.dm.bundle/_latestVersion)
