@@ -52,7 +52,7 @@ final class BundleUtils {
 
     static File[] getClasspath(Jar jarTask) {
         def project = jarTask.project
-        def configuration = project.configurations.runtime.copyRecursive()
+        def configuration = project.configurations.runtime.copyRecursive().setTransitive(project.bundle.includeTransitiveDependencies)
         def excludeDependencies = project.bundle.excludeDependencies
         excludeDependencies.each {
             configuration.exclude(it)

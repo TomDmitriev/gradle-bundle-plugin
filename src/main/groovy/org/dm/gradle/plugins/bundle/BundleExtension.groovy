@@ -12,6 +12,8 @@ class BundleExtension {
 
     boolean passProjectProperties = true
 
+    boolean includeTransitiveDependencies = false
+
     org.gradle.internal.Factory<JarBuilder> jarBuilderFactory = DefaultJarBuilderFactory.INSTANCE
 
     def instruction(String name, String... values) {

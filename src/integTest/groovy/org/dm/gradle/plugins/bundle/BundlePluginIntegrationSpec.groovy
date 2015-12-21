@@ -411,10 +411,9 @@ class BundlePluginIntegrationSpec extends Specification {
     @Issue(41)
     def "Handles non-string keys and values in bundle instructions"() {
         when:
-        buildScript.append 'ext {bar = \'bar\'}\ndef foo = "Foo"\n' +
+        buildScript.append '\next {bar = \'bar\'}\ndef foo = "Foo"\n' +
                 'bundle { instructions << ["$foo": 123.5, \'Abc\': "$foo-${bar}"] }'
         executeGradleCommand 'clean jar'
-        println "<$manifest>"
 
         then:
         manifestContains 'Foo: 123.5'
@@ -431,6 +430,36 @@ class BundlePluginIntegrationSpec extends Specification {
         then:
         manifestContains 'Xyz: Foo-bar'
         manifestContains 'Abc: 123'
+    }
+
+    @Issue(43)
+    @IgnoreRest
+    def "Transitive dependencies are not passed to bndlibs by default"() {
+        setup:
+        copyFromResources('TClass.java', 'org/foo/bar/TClass.java')
+
+        when:
+        buildScript.append '\ndependencies { compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.6.4" }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifest =~ /(?m)^Import-Package: com.fasterxml.jackson.databind,org.osgi.framework.*$/
+    }
+
+    @Issue(43)
+    @IgnoreRest
+    def "Transitive dependencies are passed to bndlibs when includeTransitiveDependencies is true"() {
+        setup:
+        copyFromResources('TClass.java', 'org/foo/bar/TClass.java')
+
+        when:
+        buildScript.append '''
+                dependencies { compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.6.4" }
+                bundle { includeTransitiveDependencies = true }'''
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifest =~ /(?m)^Import-Package: com.fasterxml.jackson.databind;version=.*$/
     }
 
     private static File createTempDir() {
