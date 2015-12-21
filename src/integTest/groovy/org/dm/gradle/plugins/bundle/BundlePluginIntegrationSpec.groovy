@@ -433,7 +433,6 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     @Issue(43)
-    @IgnoreRest
     def "Transitive dependencies are not passed to bndlibs by default"() {
         setup:
         copyFromResources('TClass.java', 'org/foo/bar/TClass.java')
@@ -447,7 +446,6 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     @Issue(43)
-    @IgnoreRest
     def "Transitive dependencies are passed to bndlibs when includeTransitiveDependencies is true"() {
         setup:
         copyFromResources('TClass.java', 'org/foo/bar/TClass.java')

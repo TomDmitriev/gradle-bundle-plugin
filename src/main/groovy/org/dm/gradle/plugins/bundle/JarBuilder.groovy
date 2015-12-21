@@ -10,7 +10,6 @@ import java.util.jar.Manifest
 
 import static aQute.bnd.osgi.Constants.INCLUDERESOURCE
 import static aQute.bnd.osgi.Constants.INCLUDE_RESOURCE
-import static org.dm.gradle.plugins.bundle.Objects.requireNonNull
 
 /**
  * A jar generator, which is basically a wrapper
@@ -19,84 +18,65 @@ import static org.dm.gradle.plugins.bundle.Objects.requireNonNull
 class JarBuilder {
     private final static Logger LOG = Logging.getLogger(JarBuilder.class)
 
-    protected final Builder builder
-    protected Jar jar
-
-    JarBuilder() {
-        this(new Builder())
-    }
-
-    JarBuilder(Builder builder) {
-        this.builder = requireNonNull(builder)
-    }
+    private String version
+    private String name
+    private def base
+    private def resources
+    private def classpath
+    private def sourcepath
+    private def properties
+    private def trace
 
     JarBuilder withVersion(String version) {
         LOG.debug "Setting version {}", version
-        if (builder.bundleVersion == null) {
-            builder.bundleVersion = version
-        }
+        this.version = version
         this
     }
 
     JarBuilder withName(String name) {
         LOG.debug "Setting name {}", name
-        if (builder.bundleSymbolicName == null) {
-            builder.bundleSymbolicName = name
-        }
+        this.name = name
         this
     }
 
-    JarBuilder withResources(files) {
-        LOG.debug "Setting resources {}", files
-        addToResources files
-        builder.addClasspath files as Collection<File>
+    JarBuilder withResources(resources) {
+        LOG.debug "Setting resources {}", resources
+        this.resources = resources
         this
     }
 
-    private addToResources(files) {
-        if (files == []) {
-            return
-        }
-        def resources = files.join(',')
-        def existingResources = builder.getProperty(INCLUDERESOURCE) ?: builder.getProperty(INCLUDE_RESOURCE)
-        if (existingResources != null) {
-            resources = existingResources + ',' + resources
-        }
-        builder.setProperty INCLUDERESOURCE, resources
-    }
-
-    JarBuilder withClasspath(files) {
-        LOG.debug "Setting classpath {}", files
-        builder.setClasspath files as File[]
+    JarBuilder withClasspath(classpath) {
+        LOG.debug "Setting classpath {}", classpath
+        this.classpath = classpath
         this
     }
 
     JarBuilder withBase(base) {
         LOG.debug "Setting base {}", base
-        builder.setBase base
+        this.base = base
         this
     }
 
-    JarBuilder withSourcepath(files) {
-        LOG.debug "Setting source path {}", files
-        builder.sourcepath = files as File[]
+    JarBuilder withSourcepath(sourcepath) {
+        LOG.debug "Setting source path {}", sourcepath
+        this.sourcepath = sourcepath
         this
     }
 
     JarBuilder withProperties(properties) {
         LOG.debug "Setting properties {}", properties
-        builder.properties = properties as Properties
+        this.properties = properties
         this
     }
 
     JarBuilder withTrace(trace) {
         LOG.debug "Setting trace {}", trace
-        builder.trace = trace
+        this.trace = trace
         this
     }
 
     void writeManifestTo(OutputStream outputStream, @Nullable Closure c) {
-        build()
+        def jar = build()
 
         def manifest = jar.manifest.clone() as Manifest
         if (c != null) {
@@ -109,18 +89,46 @@ class JarBuilder {
         writeManifestTo outputStream, null
     }
 
-    private void build() {
-        if (jar != null) {
+    private def build() {
+        def builder = new Builder()
+        if (builder.bundleVersion == null) {
+            builder.bundleVersion = version
+        }
+
+        if (builder.bundleSymbolicName == null) {
+            builder.bundleSymbolicName = name
+        }
+
+        builder.trace = trace
+        builder.base = base
+        builder.properties = properties as Properties
+        builder.sourcepath = sourcepath as File[]
+        builder.setClasspath classpath as File[]
+        builder.addClasspath resources as Collection<File>
+        addToResources builder, resources
+
+        traceClasspath(builder)
+        def jar = builder.build()
+        traceErrors(builder)
+        jar
+    }
+
+    private static addToResources(builder, files) {
+        if (files == []) {
             return
         }
-        traceClasspath()
-        jar = builder.build()
-        traceErrors()
+        def resources = files.join(',')
+        def existingResources = builder.getProperty(INCLUDERESOURCE) ?: builder.getProperty(INCLUDE_RESOURCE)
+        if (existingResources != null) {
+            resources = existingResources + ',' + resources
+        }
+        builder.setProperty INCLUDERESOURCE, resources
     }
 
     void writeJarTo(File output) {
+        def jar = null
         try {
-            build()
+            jar = build()
 
             output.getParentFile().mkdirs()
             jar.write output
@@ -131,11 +139,11 @@ class JarBuilder {
         }
     }
 
-    private void traceClasspath() {
+    private static void traceClasspath(builder) {
         LOG.debug "The Builder is about to generate a jar using classpath: ${builder.classpath.collect { it.source }}"
     }
 
-    private void traceErrors() {
+    private static void traceErrors(builder) {
         def errors = builder.errors
         if (!errors.isEmpty()) {
             LOG.error errors as String
