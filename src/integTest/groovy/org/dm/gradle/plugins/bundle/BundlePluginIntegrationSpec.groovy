@@ -325,10 +325,12 @@ class BundlePluginIntegrationSpec extends Specification {
 
     @Issue(24)
     def "bndlib can read system properties"() {
-        when:
+        setup:
+        copyToProject('bnd.bnd')
         copyToProject('include.txt')
         copyToProject('gradle.properties')
 
+        when:
         buildScript.append """
             bundle { instructions << ["-include": "bnd.bnd"] }"""
         executeGradleCommand 'clean jar'
@@ -353,6 +355,31 @@ class BundlePluginIntegrationSpec extends Specification {
 
         then:
         manifest =~ /(?m)^Import-Package:.*org.apache.camel.*$/
+    }
+
+    @Issue(33)
+    def "Gradle properties are passed to bndlib by default"() {
+        setup:
+        copyToProject('gradle.properties')
+
+        when:
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifestContains 'Qux: baz'
+    }
+
+    @Issue(33)
+    def "Gradle properties are not passed to bndlib when passProjectProperties is false"() {
+        setup:
+        copyToProject('gradle.properties')
+
+        when:
+        buildScript.append '\nbundle { passProjectProperties = false }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        !manifestContains('Qux: baz')
     }
 
     @Issue(38)

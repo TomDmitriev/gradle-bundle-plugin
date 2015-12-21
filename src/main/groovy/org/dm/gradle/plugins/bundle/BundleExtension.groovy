@@ -10,6 +10,8 @@ class BundleExtension {
 
     boolean trace = false
 
+    boolean passProjectProperties = true
+
     org.gradle.internal.Factory<JarBuilder> jarBuilderFactory = DefaultJarBuilderFactory.INSTANCE
 
     def instruction(String name, String... values) {

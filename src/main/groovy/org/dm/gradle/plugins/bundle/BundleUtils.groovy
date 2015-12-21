@@ -29,12 +29,15 @@ final class BundleUtils {
     static def getProperties(Jar jarTask) {
         def attrs = attributes(jarTask.manifest)
         def entries = jarTask.project.bundle.instructions
-        def stringProps = jarTask.project.properties.findAll {
-            it.value instanceof String
-        }
-        (attrs + entries + stringProps).collectEntries { key, value ->
+        def props = (attrs + entries).collectEntries { key, value ->
             [key as String, value as String]
         }
+        if (jarTask.project.bundle.passProjectProperties) {
+            props << jarTask.project.properties.findAll {
+                it.value instanceof String
+            }
+        }
+        props
     }
 
     //Visible for testing

@@ -31,6 +31,7 @@ class JarBuilder {
     }
 
     JarBuilder withVersion(String version) {
+        LOG.debug "Setting version {}", version
         if (builder.bundleVersion == null) {
             builder.bundleVersion = version
         }
@@ -38,6 +39,7 @@ class JarBuilder {
     }
 
     JarBuilder withName(String name) {
+        LOG.debug "Setting name {}", name
         if (builder.bundleSymbolicName == null) {
             builder.bundleSymbolicName = name
         }
@@ -45,6 +47,7 @@ class JarBuilder {
     }
 
     JarBuilder withResources(files) {
+        LOG.debug "Setting resources {}", files
         addToResources files
         builder.addClasspath files as Collection<File>
         this
@@ -63,26 +66,31 @@ class JarBuilder {
     }
 
     JarBuilder withClasspath(files) {
+        LOG.debug "Setting classpath {}", files
         builder.setClasspath files as File[]
         this
     }
 
     JarBuilder withBase(base) {
+        LOG.debug "Setting base {}", base
         builder.setBase base
         this
     }
 
     JarBuilder withSourcepath(files) {
+        LOG.debug "Setting source path {}", files
         builder.sourcepath = files as File[]
         this
     }
 
     JarBuilder withProperties(properties) {
+        LOG.debug "Setting properties {}", properties
         builder.properties = properties as Properties
         this
     }
 
     JarBuilder withTrace(trace) {
+        LOG.debug "Setting trace {}", trace
         builder.trace = trace
         this
     }
