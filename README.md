@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.7.2'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8'
     }
 }
 
@@ -88,6 +88,17 @@ bundle {
 }
 ```
 
+### Passing transitive dependencies to Bnd
+
+By default transitive dependencies are not included to the classpath passed to Bnd, to include them
+`includeTransitiveDependencies` needs to be set to true.
+
+```groovy
+bundle {
+    includeTransitiveDependencies = true
+}
+```
+
 ### Exclusion of dependencies from the classpath passed to Bnd
 
 This can be done using `exclude` property of bundle extension, for example:
@@ -96,6 +107,17 @@ This can be done using `exclude` property of bundle extension, for example:
 bundle {
     exclude module: 'guava'
     exclude group: 'org.jmock'
+}
+```
+
+### Exclusion of project properties from the set of instructions passed to Bnd
+
+By default the project properties are passed to Bnd (which means they may end up in the resulting MANIFEST.MF),
+this can be prevented by setting `passProjectProperties` to false:
+
+```groovy
+bundle {
+    passProjectProperties = false
 }
 ```
 
