@@ -90,28 +90,27 @@ class JarBuilder {
     }
 
     private def build() {
-        new Builder().withCloseable { builder ->
-            if (builder.bundleVersion == null) {
-                builder.bundleVersion = version
-            }
-
-            if (builder.bundleSymbolicName == null) {
-                builder.bundleSymbolicName = name
-            }
-
-            builder.trace = trace
-            builder.base = base
-            builder.properties = properties as Properties
-            builder.sourcepath = sourcepath as File[]
-            builder.setClasspath classpath as File[]
-            builder.addClasspath resources as Collection<File>
-            addToResources builder, resources
-
-            traceClasspath(builder)
-            def jar = builder.build()
-            traceErrors(builder)
-            jar
+        def builder = new Builder()
+        if (builder.bundleVersion == null) {
+            builder.bundleVersion = version
         }
+
+        if (builder.bundleSymbolicName == null) {
+            builder.bundleSymbolicName = name
+        }
+
+        builder.trace = trace
+        builder.base = base
+        builder.properties = properties as Properties
+        builder.sourcepath = sourcepath as File[]
+        builder.setClasspath classpath as File[]
+        builder.addClasspath resources as Collection<File>
+        addToResources builder, resources
+
+        traceClasspath(builder)
+        def jar = builder.build()
+        traceErrors(builder)
+        jar
     }
 
     private static addToResources(builder, files) {
