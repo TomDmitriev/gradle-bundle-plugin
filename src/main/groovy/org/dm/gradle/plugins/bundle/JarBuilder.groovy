@@ -76,13 +76,28 @@ class JarBuilder {
     }
 
     void writeManifestTo(OutputStream outputStream, @Nullable Closure c) {
-        def jar = build()
+        def builder = build()
 
-        def manifest = jar.manifest.clone() as Manifest
+        def manifest = builder.jar.manifest.clone() as Manifest
         if (c != null) {
             c manifest
         }
-        Jar.writeManifest manifest, outputStream
+        try {
+            Jar.writeManifest manifest, outputStream
+        } finally {
+            outputStream.close()
+            closeBuilder(builder)
+        }
+    }
+
+    private static void closeBuilder(Builder builder) {
+        if (builder != null) {
+            try {
+                builder.close();
+            } catch (IOException e) {
+                LOG.warning("Caught exception during builder.close(): " + e);
+            }
+        }
     }
 
     void writeManifestTo(OutputStream outputStream) {
@@ -108,9 +123,9 @@ class JarBuilder {
         addToResources builder, resources
 
         traceClasspath(builder)
-        def jar = builder.build()
+        builder.build()
         traceErrors(builder)
-        jar
+        builder
     }
 
     private static addToResources(builder, files) {
@@ -126,16 +141,14 @@ class JarBuilder {
     }
 
     void writeJarTo(File output) {
-        def jar = null
+        def builder = null
         try {
-            jar = build()
+            builder = build()
 
             output.getParentFile().mkdirs()
-            jar.write output
+            builder.jar.write output
         } finally {
-            if (jar != null) {
-                jar.close()
-            }
+            closeBuilder(builder)
         }
     }
 

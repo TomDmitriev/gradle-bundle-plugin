@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8.1'
     }
 }
 
@@ -129,6 +129,22 @@ To enable blueprint support you need to pass the following instruction to Bnd:
 bundle {
     instruction '-plugin', 'aQute.lib.spring.SpringXMLType'
 }
+```
+
+### Known issues
+When the Gradle Daemon is enabled for a multi-module project, the plugin may produce a compilation `bad class file`
+error. To get around it compilation needs to be run in a separate process, i. e. the following settings need applying:
+```groovy
+subprojects {
+	...
+
+	compileJava {
+		options.fork = true
+	}
+	
+	...
+}
+
 ```
 
 ### Gradle 1.x support
