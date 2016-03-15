@@ -30,7 +30,7 @@ final class BundleUtils {
         def attrs = attributes(jarTask.manifest)
         def entries = jarTask.project.bundle.instructions
         def props = (attrs + entries).collectEntries { key, value ->
-            [key as String, value as String]
+            [key as String, String.valueOf(value)]
         }
         if (jarTask.project.bundle.passProjectProperties) {
             props << jarTask.project.properties.findAll {

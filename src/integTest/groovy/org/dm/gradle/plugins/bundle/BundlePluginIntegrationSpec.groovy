@@ -460,6 +460,16 @@ class BundlePluginIntegrationSpec extends Specification {
         manifest =~ /(?m)^Import-Package: com.fasterxml.jackson.databind;version=.*$/
     }
 
+    @Issue(53)
+    def "Handles bundle instructions with null values"() {
+        when:
+        buildScript.append 'bundle { instructions << ["Foo": null] }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifestContains 'Foo: null'
+    }
+
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
         temp.mkdirs()
