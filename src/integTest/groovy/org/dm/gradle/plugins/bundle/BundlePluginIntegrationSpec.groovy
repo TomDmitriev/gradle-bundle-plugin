@@ -204,10 +204,10 @@ class BundlePluginIntegrationSpec extends Specification {
     def "Can trace bnd build process"() {
         when:
         buildScript.append '\nbundle { trace = true }'
-        executeGradleCommand 'clean jar'
+        executeGradleCommand 'clean jar -i'
 
         then:
-        stderr =~ /(?m)^# build$/
+        stdout =~ /(?m)begin DSAnnotations$/
     }
 
     def "jar task actions contain only a bundle generator action"() {
