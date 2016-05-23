@@ -7,6 +7,7 @@ import spock.lang.Specification
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
+import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
@@ -468,6 +469,16 @@ class BundlePluginIntegrationSpec extends Specification {
 
         then:
         manifestContains 'Foo: null'
+    }
+
+    @Issue(59)
+    def "Produces an error when the build has errors"() {
+        when:
+        buildScript.append '\nbundle { failBuild = true\ninstruction "-plugin", "org.example.foo.Bar" }'
+        executeGradleCommand 'clean jar', 1
+
+        then:
+        stderr.contains 'Build has errors'
     }
 
     private static File createTempDir() {
