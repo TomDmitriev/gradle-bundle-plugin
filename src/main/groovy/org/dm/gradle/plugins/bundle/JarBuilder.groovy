@@ -2,6 +2,7 @@ package org.dm.gradle.plugins.bundle
 
 import aQute.bnd.osgi.Builder
 import aQute.bnd.osgi.Jar
+import org.gradle.api.GradleException
 import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
@@ -26,6 +27,7 @@ class JarBuilder {
     private def sourcepath
     private def properties
     private def trace
+    private def failOnError
 
     JarBuilder withVersion(String version) {
         LOG.debug "Setting version {}", version
@@ -72,6 +74,12 @@ class JarBuilder {
     JarBuilder withTrace(trace) {
         LOG.debug "Setting trace {}", trace
         this.trace = trace
+        this
+    }
+
+    JarBuilder withFailOnError(failOnError) {
+        LOG.debug "Setting fail on error {}", failOnError
+        this.failOnError = failOnError
         this
     }
 
@@ -125,6 +133,11 @@ class JarBuilder {
         traceClasspath(builder)
         builder.build()
         traceErrors(builder)
+
+        if (failOnError && !builder.ok) {
+            throw new GradleException("Build has errors")
+        }
+
         builder
     }
 

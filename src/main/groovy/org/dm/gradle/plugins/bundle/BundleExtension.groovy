@@ -10,6 +10,8 @@ class BundleExtension {
 
     boolean trace = false
 
+    boolean failOnError = false
+
     boolean passProjectProperties = true
 
     boolean includeTransitiveDependencies = false
