@@ -81,6 +81,10 @@ final class BundleUtils {
         jarTask.project.bundle.trace
     }
 
+    static boolean getFailBuild(Jar jarTask) {
+        jarTask.project.bundle.failBuild
+    }
+
     static def getOutput(Jar jarTask) {
         jarTask.archivePath
     }
