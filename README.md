@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8.3'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8.4'
     }
 }
 
@@ -85,6 +85,16 @@ You can enable bnd tracing by setting `bundle.trace` to true.
 ```groovy
 bundle {
     trace = true
+}
+```
+
+### Failing build in case of bnd build errors
+
+You can make Gradle to fail the build in case of bnd build errors by setting `bundle.failOnError` to true.
+
+```groovy
+bundle {
+    failOnError = true
 }
 ```
 
