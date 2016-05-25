@@ -29,6 +29,7 @@ final class JarBuilderFactoryDecorator implements org.gradle.internal.Factory<Ja
                 withResources(getResources(project)).
                 withVersion(getVersion(project)).
                 withName(getBundleSymbolicName(project)).
-                withTrace(getTrace(jarTask))
+                withTrace(getTrace(jarTask)).
+                withFailOnError(getFailOnError(jarTask))
     }
 }
