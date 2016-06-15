@@ -17,7 +17,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.gradle.plugin-publish'
 
 group = 'org.dm.gradle'
-version = '0.8.5-SNAPSHOT'
+version = '0.8.5'
 
 def compatibilityVersion = 1.6
 sourceCompatibility = compatibilityVersion
@@ -182,5 +182,5 @@ eclipse.classpath.file {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+    gradleVersion = '2.14'
 }

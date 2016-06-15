@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8.4'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8.5'
     }
 }
 
