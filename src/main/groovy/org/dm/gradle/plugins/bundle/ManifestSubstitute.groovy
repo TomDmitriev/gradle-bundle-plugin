@@ -47,10 +47,7 @@ class ManifestSubstitute implements ManifestInternal {
 
     @Override
     Manifest writeTo(Writer writer) {
-        jarBuilderFactory.create().writeManifestTo(new WriterToOutputStreamAdapter(writer, charset)) { manifest ->
-            manifest.mainAttributes.remove(new java.util.jar.Attributes.Name(BND_LASTMODIFIED))
-        }
-        return this
+        return writeTo(new WriterToOutputStreamAdapter(writer, charset))
     }
 
     /* Delegated methods, nothing interesting */
