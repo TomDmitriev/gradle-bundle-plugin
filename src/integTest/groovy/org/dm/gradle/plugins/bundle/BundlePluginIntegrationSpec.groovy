@@ -20,6 +20,8 @@ class BundlePluginIntegrationSpec extends Specification {
     @Shared
     File projectDir = createTempDir()
     @Shared
+    String projectDirPath = projectDir.toString().replace('\\' as char, '/' as char)
+    @Shared
     File buildScript = resolve(projectDir, 'build.gradle')
     @Shared
     String stdout, stderr, jarName
@@ -258,7 +260,7 @@ class BundlePluginIntegrationSpec extends Specification {
         when:
         buildScript.append """
             dependencies { compile "org.springframework:spring-instrument:4.0.6.RELEASE" }
-            bundle { instruction "-include", "${projectDir}/bnd.bnd" }"""
+            bundle { instruction "-include", "${projectDirPath}/bnd.bnd" }"""
         executeGradleCommand 'clean jar'
 
         then:
@@ -273,7 +275,7 @@ class BundlePluginIntegrationSpec extends Specification {
         resolve(projectDir, resource).write 'this resource should be included'
 
         when:
-        buildScript.append "\nbundle { instruction 'Include-Resource', '${projectDir}/${resource}' }"
+        buildScript.append "\nbundle { instruction 'Include-Resource', '${projectDirPath}/${resource}' }"
         executeGradleCommand 'clean jar'
 
         then:
@@ -288,7 +290,7 @@ class BundlePluginIntegrationSpec extends Specification {
         resolve(projectDir, resource).write 'this resource should be included'
 
         when:
-        buildScript.append "\nbundle { instruction '-includeresource', '${projectDir}/${resource}' }"
+        buildScript.append "\nbundle { instruction '-includeresource', '${projectDirPath}/${resource}' }"
         executeGradleCommand 'clean jar'
 
         then:
