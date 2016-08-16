@@ -471,6 +471,35 @@ class BundlePluginIntegrationSpec extends Specification {
         manifestContains 'Foo: null'
     }
 
+    @Issue(56)
+    def "Supports compileOnly"() {
+        setup:
+        copyFromResources('AClass.java', 'org/foo/bar/AClass.java')
+
+        when:
+        buildScript.append 'dependencies { compileOnly "com.google.guava:guava:18.0" }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifest =~ /(?m)^Import-Package: com.google.common.hash;version=.*$/
+    }
+
+    @Issue(56)
+    def "Supports compileOnly excludeDependencies"() {
+        setup:
+        copyFromResources('AClass.java', 'org/foo/bar/AClass.java')
+
+        when:
+        buildScript.append """
+            dependencies { compileOnly 'com.google.guava:guava:18.0' }
+            bundle { exclude module: 'guava' }"""
+        executeGradleCommand 'clean jar'
+
+        then:
+        // com.google.common.hash is expected to have no version
+        manifest =~ /(?m)^Import-Package: com.google.common.hash,org.osgi.framework;version=.*$/
+    }
+
     @Issue(59)
     def "Produces an error when the build has errors"() {
         when:
