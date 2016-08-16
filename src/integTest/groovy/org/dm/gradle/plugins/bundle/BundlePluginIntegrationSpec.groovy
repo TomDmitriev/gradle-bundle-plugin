@@ -523,7 +523,9 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private def getManifest() {
-        jarFile.getInputStream(new ZipEntry('META-INF/MANIFEST.MF')).text
+        jarFile.withCloseable {
+            it.getInputStream(new ZipEntry('META-INF/MANIFEST.MF')).text
+        }
     }
 
     private ZipFile getJarFile() {
@@ -531,6 +533,8 @@ class BundlePluginIntegrationSpec extends Specification {
     }
 
     private def jarContains(String entry) {
-        jarFile.getEntry(entry) != null
+        jarFile.withCloseable {
+            it.getEntry(entry) != null
+        }
     }
 }
