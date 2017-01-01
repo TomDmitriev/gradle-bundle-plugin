@@ -1,20 +1,10 @@
-buildscript {
-    repositories {
-        maven { url 'http://jcenter.bintray.com' }
-        maven { url 'https://plugins.gradle.org/m2/' }
-    }
-
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.5'
-        classpath 'com.gradle.publish:plugin-publish-plugin:0.9.3'
-    }
+plugins {
+    id 'eclipse'
+    id 'groovy'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'com.jfrog.bintray' version '1.7.3'
 }
-
-apply plugin: 'eclipse'
-apply plugin: 'groovy'
-apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.gradle.plugin-publish'
 
 group = 'org.dm.gradle'
 version = '0.8.7-SNAPSHOT'
@@ -28,7 +18,7 @@ repositories {
 
     mavenCentral()
 
-    maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 sourceSets {
@@ -49,9 +39,9 @@ dependencies {
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
-    testCompile "org.codehaus.groovy:groovy-all:${project.hasProperty('groovy.version') ? project.getProperty('groovy.version') : '2.4.4'}"
+    testCompile "org.codehaus.groovy:groovy-all:${project.hasProperty('groovy.version') ? project.getProperty('groovy.version') : '2.4.7'}"
 
-    testRuntime 'cglib:cglib-nodep:3.2.0'
+    testRuntime 'cglib:cglib-nodep:3.2.4'
 
     integTestCompile sourceSets.main.output
     integTestCompile configurations.testCompile
@@ -182,5 +172,5 @@ eclipse.classpath.file {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
+    gradleVersion = '3.2.1'
 }
