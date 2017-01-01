@@ -16,22 +16,13 @@ Plugin is hosted in Maven Central Repository. You can easily add plugin to your 
 script using following configuration
 
 ```groovy
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.8.6'
-    }
+plugins {
+    id 'org.dm.bundle' version '0.9.0'
 }
-
-apply plugin: 'org.dm.bundle'
-
 ```
 
-Depending on the type of your project you also need to add `apply plugin: 'java'` or 
-`apply plugin: 'groovy'`, etc.
+Depending on the type of your project you also need to add `id 'java'` or 
+`id 'groovy'`, etc.
 
 
 ## Tasks
