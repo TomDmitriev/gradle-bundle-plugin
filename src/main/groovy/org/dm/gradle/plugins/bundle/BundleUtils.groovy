@@ -76,11 +76,17 @@ final class BundleUtils {
         }
     }
 
-    static File[] getResources(Project project) {
-        def output = project.sourceSets.main.output
-        [output.classesDir, output.resourcesDir].findAll {
-            it.exists()
+    static File[] getResources(Jar jarTask) {
+        def paths = []
+        jarTask.source.visit { entry ->
+            if ('MANIFEST.MF' != entry.relativePath.pathString) {
+                def path = entry.file.parentFile.canonicalPath
+                if (paths.every { !path.startsWith(it) }) {
+                    paths << path + File.separator
+                }
+            }
         }
+        paths.collect { path -> new File(path as String) }
     }
 
     static boolean getTrace(Jar jarTask) {
@@ -91,7 +97,7 @@ final class BundleUtils {
         jarTask.project.bundle.failOnError
     }
 
-    static def getOutput(Jar jarTask) {
+    static File getOutput(Jar jarTask) {
         jarTask.archivePath
     }
 

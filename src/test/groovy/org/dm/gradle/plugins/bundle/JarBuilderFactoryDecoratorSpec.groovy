@@ -21,7 +21,7 @@ class JarBuilderFactoryDecoratorSpec extends Specification {
 
     def "creates jarBuilder only once"() {
         setup:
-        BundleUtils.getResources(project) >> []
+        BundleUtils.getResources(jarTask) >> []
         BundleUtils.getVersion(project) >> ''
 
         when:
