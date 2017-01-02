@@ -5,7 +5,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'org.dm.gradle:gradle-bundle-plugin:0.9.1-SNAPSHOT'
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.10.0'
     }
 }
 apply plugin: 'org.dm.bundle'

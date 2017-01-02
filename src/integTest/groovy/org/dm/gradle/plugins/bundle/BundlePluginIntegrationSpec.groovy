@@ -7,7 +7,6 @@ import spock.lang.Specification
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
-import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
@@ -52,8 +51,10 @@ class BundlePluginIntegrationSpec extends Specification {
         resolve(javaSrc, name).write getClass().classLoader.getResource(path).text
     }
 
-    private copyToProject(String name) {
-        resolve(projectDir, name).write getClass().classLoader.getResource(name).text
+    private copyToProject(String path) {
+        def file = resolve(projectDir, path)
+        file.parentFile.mkdirs()
+        file.write getClass().classLoader.getResource(path).text
     }
 
     void setup() {
@@ -510,6 +511,19 @@ class BundlePluginIntegrationSpec extends Specification {
 
         then:
         stderr.contains 'Build has errors'
+    }
+
+    @Issue(68)
+    def "Honours all jar task inputs"() {
+        setup:
+        copyToProject('res/nested/resource.txt')
+
+        when:
+        buildScript.append '\njar { from "res" }'
+        executeGradleCommand 'clean jar'
+
+        then:
+        jarContains 'nested/resource.txt'
     }
 
     private static File createTempDir() {

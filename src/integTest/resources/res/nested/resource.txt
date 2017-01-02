@@ -1,0 +1,1 @@
+Should be added using JarTask.from method

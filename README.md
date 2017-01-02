@@ -17,7 +17,7 @@ script using following configuration
 
 ```groovy
 plugins {
-    id 'org.dm.bundle' version '0.9.0'
+    id 'org.dm.bundle' version '0.10.0'
 }
 ```
 
