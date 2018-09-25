@@ -29,7 +29,7 @@ class BundlePlugin implements Plugin<Project> {
                 def jarBuilderFactory = new JarBuilderFactoryDecorator(
                         jarTask, project.bundle.jarBuilderFactory)
 
-                deleteAllActions()
+                getTaskActions().clear()
                 doLast(new BundleGenerator(jarBuilderFactory))
                 manifest = new ManifestSubstitute(jarBuilderFactory, manifest)
             }
