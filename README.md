@@ -11,6 +11,10 @@ is that it uses [the bnd tool](http://www.aqute.biz/Bnd/Bnd) to generate not onl
 manifest but a whole jar.
 
 
+## Project Status
+**The project is no longer maintained (due to lack of time). You are free to fork it or use any of the existing forks under Apache 2.0 license.**
+
+
 ## Installation
 Plugin is hosted in Maven Central Repository. You can easily add plugin to your build
 script using following configuration
