@@ -12,7 +12,7 @@ manifest but a whole jar.
 
 
 ## Project Status
-**The project is no longer maintained (due to lack of time). You are free to fork it or use any of the existing forks under Apache 2.0 license.**
+**The project is no longer maintained (due to lack of time). You are free to fork it or use any of the existing forks under Apache 2.0 license. If anyone is interested in resurrecting the project and become its maintainer you can email me at dm.artyom@gmail.com.**
 
 
 ## Installation
