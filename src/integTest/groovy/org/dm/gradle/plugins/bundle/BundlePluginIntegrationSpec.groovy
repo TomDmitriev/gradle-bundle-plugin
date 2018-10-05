@@ -1,7 +1,7 @@
 package org.dm.gradle.plugins.bundle
 
+import spock.lang.Ignore
 import spock.lang.Shared
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import java.util.zip.ZipEntry
@@ -205,6 +205,10 @@ class BundlePluginIntegrationSpec extends Specification {
         stderr =~ /Bundle-Activator not found/
     }
 
+    /**
+     * After Bndlib 3.3, trace has not much effect anymore. Output is instead controlled by the slf4j log level now. We can still test though if we set the trace flag.
+     **/
+    @Ignore("There is no reasonable assertion for trace flag within bndlib anymore..")
     def "Can trace bnd build process"() {
         when:
         buildScript.append '\nbundle { trace = true }'
