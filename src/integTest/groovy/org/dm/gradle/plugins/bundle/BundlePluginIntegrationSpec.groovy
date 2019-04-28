@@ -526,6 +526,39 @@ class BundlePluginIntegrationSpec extends Specification {
         jarContains 'nested/resource.txt'
     }
 
+    @Issue(88)
+    def "Doublecheck default behaviour of buildPathConfigurations using runtime configuration"() {
+        setup:
+        resolve(projectDir, 'bnd.bnd').write 'Private-Package: org.springframework.*'
+
+        when:
+        buildScript.append """
+            |dependencies { runtime "org.springframework:spring-instrument:4.0.6.RELEASE" }
+            |bundle { instruction "-include", "${projectDirPath}/bnd.bnd" }""".stripMargin()
+        executeGradleCommand 'clean jar'
+
+        then:
+        manifestContains 'Private-Package:.*org.springframework.instrument,.*'
+    }
+
+    @Issue(88)
+    def "Set buildPathConfigurations to compileOnly"() {
+        setup:
+        resolve(projectDir, 'bnd.bnd').write 'Private-Package: org.springframework.*'
+
+        when:
+        buildScript.append """
+            |dependencies { runtime "org.springframework:spring-instrument:4.0.6.RELEASE" }
+            |bundle {
+            |    instruction "-include", "${projectDirPath}/bnd.bnd"
+            |    buildPathConfigurations 'compileOnly'
+            |}""".stripMargin()
+        executeGradleCommand 'clean jar'
+
+        then:
+        stdout.contains '[Unused Private-Package instructions, no such package(s) on the class path: [org.springframework.*]'
+    }
+
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
         temp.mkdirs()

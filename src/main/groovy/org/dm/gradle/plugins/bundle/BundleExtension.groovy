@@ -6,6 +6,8 @@ package org.dm.gradle.plugins.bundle
 class BundleExtension {
     private final def instructions = [:]
 
+    private final def buildPathConfigurations = ["compileOnly", "runtime"]
+
     private final def excludeDependencies = []
 
     boolean trace = false
@@ -40,5 +42,14 @@ class BundleExtension {
 
     def getExcludeDependencies() {
         return excludeDependencies
+    }
+
+    def buildPathConfigurations(String... configurations) {
+        buildPathConfigurations.clear()
+        buildPathConfigurations << Arrays.asList(configurations)
+    }
+
+    def getBuildPathConfigurations() {
+        return buildPathConfigurations
     }
 }

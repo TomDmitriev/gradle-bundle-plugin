@@ -115,6 +115,19 @@ bundle {
 }
 ```
 
+### Classpath Configurations
+
+The `classpath` provided to Bnd by default is `[project.configurations.compileOnly, project.configurations.runtime]`. This can be **overridden** using `buildPathConfigurations` property of the bundle extension, for example:
+
+```groovy
+bundle {
+    // argument is String vararg (String...)
+    buildPathConfigurations 'compileClasspath', 'other'
+}
+```
+
+**Note:** This enables BOM support (available since gradle `4.6`) whose configurations must be derived from `implementation`, such as `compileClasspath` and `runtimeClasspath`.
+
 ### Exclusion of project properties from the set of instructions passed to Bnd
 
 By default the project properties are passed to Bnd (which means they may end up in the resulting MANIFEST.MF),
