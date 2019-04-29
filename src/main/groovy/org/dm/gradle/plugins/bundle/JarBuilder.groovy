@@ -26,7 +26,6 @@ class JarBuilder {
     private def classpath
     private def sourcepath
     private def properties
-    private def trace
     private def failOnError
     private def bndBuilder
 
@@ -72,12 +71,6 @@ class JarBuilder {
         this
     }
 
-    JarBuilder withTrace(trace) {
-        LOG.debug "Setting trace {}", trace
-        this.trace = trace
-        this
-    }
-
     JarBuilder withFailOnError(failOnError) {
         LOG.debug "Setting fail on error {}", failOnError
         this.failOnError = failOnError
@@ -114,7 +107,6 @@ class JarBuilder {
             bndBuilder.bundleSymbolicName = name
         }
 
-        bndBuilder.trace = trace
         bndBuilder.base = base
         bndBuilder.properties = properties as Properties
         bndBuilder.sourcepath = sourcepath as File[]

@@ -75,13 +75,7 @@ will not include groovy or scala sources.
 
 ### Bnd tracing
 
-You can enable bnd tracing by setting `bundle.trace` to true.
-
-```groovy
-bundle {
-    trace = true
-}
-```
+Custom tracing in Bnd was replaced by slf4j logging which has native support in gradle. See the gradle logging options.
 
 ### Failing build in case of bnd build errors
 

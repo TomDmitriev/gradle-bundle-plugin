@@ -205,15 +205,6 @@ class BundlePluginIntegrationSpec extends Specification {
         stderr =~ /Bundle-Activator not found/
     }
 
-    def "Can trace bnd build process"() {
-        when:
-        buildScript.append '\nbundle { trace = true }'
-        executeGradleCommand 'clean jar -i'
-
-        then:
-        stdout =~ /(?m)begin DSAnnotations$/
-    }
-
     def "jar task actions contain only a bundle generator action"() {
         when:
         buildScript.append "task actionscheck { doLast { println jar.actions.size() + \" \" + jar.actions[0].@action.getClass().getSimpleName() } }"

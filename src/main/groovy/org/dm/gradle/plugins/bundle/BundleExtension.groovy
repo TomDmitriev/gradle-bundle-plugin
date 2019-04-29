@@ -10,6 +10,9 @@ class BundleExtension {
 
     private final def excludeDependencies = []
 
+    /**
+     * Trace is deprecated in Bnd. This setting will be ignored.
+     */
     boolean trace = false
 
     boolean failOnError = false
