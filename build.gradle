@@ -9,7 +9,7 @@ plugins {
 group = 'org.dm.gradle'
 version = '0.10.1-SNAPSHOT'
 
-def compatibilityVersion = 1.6
+def compatibilityVersion = 1.8
 sourceCompatibility = compatibilityVersion
 targetCompatibility = compatibilityVersion
 
@@ -25,6 +25,8 @@ sourceSets {
     integTest {
         groovy.srcDir file('src/integTest/groovy')
         resources.srcDir file('src/integTest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntime
+        runtimeClasspath += output + compileClasspath
     }
 }
 
@@ -36,28 +38,23 @@ dependencies {
 
     compile 'biz.aQute.bnd:biz.aQute.bndlib:4.2.0'
 
-    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
+        exclude group: 'org.codehaus.groovy'
     }
-    testCompile "org.codehaus.groovy:groovy-all:${project.hasProperty('groovy.version') ? project.getProperty('groovy.version') : '2.4.7'}"
 
     testRuntime 'cglib:cglib-nodep:3.2.4'
-
-    integTestCompile sourceSets.main.output
-    integTestCompile configurations.testCompile
-    integTestRuntime configurations.testRuntime
 }
 
 task integTest(type: Test, dependsOn: classes) {
-    testClassesDir = sourceSets.integTest.output.classesDir
+    testClassesDirs = sourceSets.integTest.output.classesDirs
     classpath = sourceSets.integTest.runtimeClasspath
+    mustRunAfter test
     reports.html.destination = file("$buildDir/reports/integTests")
     reports.junitXml.destination = file("$buildDir/integTest-results")
     binResultsDir = file("${reports.junitXml.destination}/binary/integTest")
 }
 
 check.dependsOn integTest
-
 
 jar {
     manifest {
@@ -171,6 +168,7 @@ eclipse.classpath.file {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.2.1'
+wrapper {
+    gradleVersion = '4.10.2'
+    distributionType = Wrapper.DistributionType.ALL
 }

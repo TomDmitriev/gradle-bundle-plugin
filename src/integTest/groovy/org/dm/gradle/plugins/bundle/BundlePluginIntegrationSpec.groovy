@@ -76,7 +76,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'clean build'
 
         then:
-        stdout =~ /(?m)^:jar$/
+        stdout =~ /(?m)^> Task :jar$/
     }
 
     def "Uses project version as 'Bundle-Version' by default"() {
@@ -140,7 +140,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'clean jar'
 
         then:
-        stdout =~ /(?m)^BUILD SUCCESSFUL$/
+        stdout =~ /(?m)^BUILD SUCCESSFUL/
     }
 
     def "Includes project output class files by default"() {
@@ -201,7 +201,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'clean jar'
 
         then:
-        stdout =~ /(?m)^BUILD SUCCESSFUL$/
+        stdout =~ /(?m)^BUILD SUCCESSFUL/
         stderr =~ /Bundle-Activator not found/
     }
 
@@ -230,7 +230,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'jar'
 
         then:
-        stdout =~ /(?m)^:jar UP-TO-DATE$/
+        stdout =~ /(?m)^> Task :jar UP-TO-DATE$/
     }
 
     @Issue(1)
@@ -241,7 +241,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'jar'
 
         then:
-        stdout =~ /(?m)^:jar$/
+        stdout =~ /(?m)^> Task :jar$/
     }
 
     @Issue(8)
@@ -501,7 +501,7 @@ class BundlePluginIntegrationSpec extends Specification {
         executeGradleCommand 'clean jar', 1
 
         then:
-        stderr.contains 'Build has errors'
+        stderr.contains 'FAILURE: Build failed with an exception.'
     }
 
     @Issue(68)

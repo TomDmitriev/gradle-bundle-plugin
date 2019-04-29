@@ -3,7 +3,6 @@ package org.dm.gradle.plugins.bundle
 import aQute.bnd.osgi.Builder
 import aQute.bnd.osgi.Jar
 import org.gradle.api.GradleException
-import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
@@ -77,7 +76,7 @@ class JarBuilder {
         this
     }
 
-    void writeManifestTo(OutputStream outputStream, @Nullable Closure c) {
+    void writeManifestTo(OutputStream outputStream, @javax.annotation.Nullable Closure c) {
         def manifest = build().jar.manifest.clone() as Manifest
         if (c != null) {
             c manifest

@@ -45,7 +45,6 @@ class ManifestSubstitute implements ManifestInternal {
 
     /* Manifest implementation */
 
-    @Override
     Manifest writeTo(Writer writer) {
         return writeTo(new WriterToOutputStreamAdapter(writer, charset))
     }
