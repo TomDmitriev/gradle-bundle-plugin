@@ -28,6 +28,7 @@ class JarBuilder {
     private def properties
     private def trace
     private def failOnError
+    private def bndBuilder
 
     JarBuilder withVersion(String version) {
         LOG.debug "Setting version {}", version
@@ -84,9 +85,7 @@ class JarBuilder {
     }
 
     void writeManifestTo(OutputStream outputStream, @Nullable Closure c) {
-        def builder = build()
-
-        def manifest = builder.jar.manifest.clone() as Manifest
+        def manifest = build().jar.manifest.clone() as Manifest
         if (c != null) {
             c manifest
         }
@@ -94,17 +93,6 @@ class JarBuilder {
             Jar.writeManifest manifest, outputStream
         } finally {
             outputStream.close()
-            closeBuilder(builder)
-        }
-    }
-
-    private static void closeBuilder(Builder builder) {
-        if (builder != null) {
-            try {
-                builder.close();
-            } catch (IOException e) {
-                LOG.warning("Caught exception during builder.close(): " + e);
-            }
         }
     }
 
@@ -112,33 +100,37 @@ class JarBuilder {
         writeManifestTo outputStream, null
     }
 
-    private def build() {
-        def builder = new Builder()
-        if (builder.bundleVersion == null) {
-            builder.bundleVersion = version
+    private Builder build() {
+        if (bndBuilder) {
+            return bndBuilder
         }
 
-        if (builder.bundleSymbolicName == null) {
-            builder.bundleSymbolicName = name
+        bndBuilder = new Builder()
+        if (bndBuilder.bundleVersion == null) {
+            bndBuilder.bundleVersion = version
         }
 
-        builder.trace = trace
-        builder.base = base
-        builder.properties = properties as Properties
-        builder.sourcepath = sourcepath as File[]
-        builder.setClasspath classpath as File[]
-        builder.addClasspath resources as Collection<File>
-        addToResources builder, resources
+        if (bndBuilder.bundleSymbolicName == null) {
+            bndBuilder.bundleSymbolicName = name
+        }
 
-        traceClasspath(builder)
-        builder.build()
-        traceErrors(builder)
+        bndBuilder.trace = trace
+        bndBuilder.base = base
+        bndBuilder.properties = properties as Properties
+        bndBuilder.sourcepath = sourcepath as File[]
+        bndBuilder.setClasspath classpath as File[]
+        bndBuilder.addClasspath resources as Collection<File>
+        addToResources bndBuilder, resources
 
-        if (failOnError && !builder.ok) {
+        traceClasspath(bndBuilder)
+        bndBuilder.build()
+        traceErrors(bndBuilder)
+
+        if (failOnError && !bndBuilder.ok) {
             throw new GradleException("Build has errors")
         }
 
-        builder
+        bndBuilder
     }
 
     private static addToResources(builder, files) {
@@ -154,15 +146,8 @@ class JarBuilder {
     }
 
     void writeJarTo(File output) {
-        def builder = null
-        try {
-            builder = build()
-
-            output.getParentFile().mkdirs()
-            builder.jar.write output
-        } finally {
-            closeBuilder(builder)
-        }
+        output.getParentFile().mkdirs()
+        build().withCloseable { it.jar.write output }
     }
 
     private static void traceClasspath(builder) {

@@ -559,6 +559,24 @@ class BundlePluginIntegrationSpec extends Specification {
         stdout.contains '[Unused Private-Package instructions, no such package(s) on the class path: [org.springframework.*]'
     }
 
+    @Issue(90)
+    def "Prevent duplicate warnings and errors"() {
+        setup:
+        resolve(projectDir, 'bnd.bnd').write 'Private-Package: org.springframework.*'
+
+        when:
+        buildScript.append """
+            |dependencies { runtime "org.springframework:spring-instrument:4.0.6.RELEASE" }
+            |bundle {
+            |    instruction "-include", "${projectDirPath}/bnd.bnd"
+            |    buildPathConfigurations 'compileOnly'
+            |}""".stripMargin()
+        executeGradleCommand 'clean jar'
+
+        then:
+        1 == stdout.split('\n').findAll {it =~ /^\[Unused Private-Package instructions/ }.size
+    }
+
     private static File createTempDir() {
         def temp = resolve(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString())
         temp.mkdirs()
