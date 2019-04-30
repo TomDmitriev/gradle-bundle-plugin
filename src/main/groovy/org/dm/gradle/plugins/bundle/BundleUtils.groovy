@@ -8,6 +8,8 @@ import org.gradle.api.tasks.bundling.Jar
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.zip.ZipException
+import java.util.zip.ZipFile
 
 import static java.util.regex.Pattern.compile
 
@@ -61,7 +63,22 @@ final class BundleUtils {
                 excludeDependencies.each {
                     configuration.exclude(it)
                 }
-                classpath += configuration.files
+                classpath += configuration.files.findAll { File file ->
+                    if (!file.exists()) {
+                        return false
+                    }
+                    if (file.directory) {
+                        return true
+                    }
+                    try {
+                        new ZipFile(file).withCloseable { ZipFile zip ->
+                            zip.entries() // make sure it is a valid zip file and not a pom
+                        }
+                    } catch (ZipException e) {
+                        return false
+                    }
+                    return true
+                }
             }
             classpath
         }
