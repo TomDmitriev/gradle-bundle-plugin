@@ -87,7 +87,7 @@ final class BundleUtils {
                 }
             }
         }
-        paths.collect { path -> new File(path as String) }
+        paths.unique().collect { path -> new File(path as String) }
     }
 
     static boolean getFailOnError(Jar jarTask) {
